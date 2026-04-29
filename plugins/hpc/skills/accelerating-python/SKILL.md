@@ -1,6 +1,5 @@
 ---
-title: Accelerating Python
-slug: accelerating-python
+name: accelerating-python
 description: Speed up Python by choosing better algorithms, vectorization, DuckDB/Polars, Numba, or GPUs before adding blind multiprocessing. TRIGGER when Python jobs are slow, CPU-bound, memory-heavy, or considering parallelism/GPU acceleration.
 related:
   - running-python
@@ -10,7 +9,6 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Accelerating Python
 
 Rule: profile first. Then choose the smallest acceleration that matches the bottleneck.

@@ -1,6 +1,5 @@
 ---
-title: Managing Jobs
-slug: managing-jobs
+name: managing-jobs
 description: Submit, monitor, cancel, array, and chain Slurm jobs safely. TRIGGER when writing sbatch scripts, choosing resources/partitions, using job arrays, dependencies, sacct/squeue, or cancelling jobs.
 related:
   - overview
@@ -11,7 +10,6 @@ related:
   - using-gpus
 updated: 2026-04-28
 ---
-
 # Managing Jobs
 
 Rule: test small, request explicitly, monitor results, then scale.

@@ -1,6 +1,5 @@
 ---
-title: Self-Diagnosing Resource Use
-slug: self-diagnosing-resource-use
+name: self-diagnosing-resource-use
 description: Check whether jobs used requested CPUs, memory, GPUs, filesystem, and queue time skillfully. TRIGGER when a job is slow, killed, pending, idle, over-requested, under-requested, or needs post-run resource diagnosis.
 related:
   - managing-jobs
@@ -10,7 +9,6 @@ related:
   - working-with-large-data
 updated: 2026-04-28
 ---
-
 # Self-Diagnosing Resource Use
 
 Rule: after every serious job, check what you actually used and right-size the next job.
@@ -80,7 +78,7 @@ find /gpfs/scratch60/$USER -mtime +30 -size +1G -ls 2>/dev/null | head
 find output -type f | wc -l
 ```
 
-If a job creates thousands of files, strongly consider redesigning the output storage. See [using the filesystem](./using-the-filesystem.md) for Parquet, JSONL, zip, local `/tmp`, and atomic-write patterns.
+If a job creates thousands of files, strongly consider redesigning the output storage. See [using the filesystem](../using-the-filesystem/SKILL.md) for Parquet, JSONL, zip, local `/tmp`, and atomic-write patterns.
 
 ## Agent-friendly checkup script
 

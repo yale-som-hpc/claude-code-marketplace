@@ -1,0 +1,15 @@
+{
+  "name": "yale-som-hpc",
+  "owner": { "name": "Yale SOM HPC" },
+  "description": "Skills for working on the Yale SOM HPC cluster.",
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "hpc",
+      "source": "./hpc",
+      "description": "Yale SOM HPC skills: Slurm, GPUs, Python, R, Stata, GPFS, data acquisition."
+    }
+  ]
+}

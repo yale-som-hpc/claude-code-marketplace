@@ -1,6 +1,5 @@
 ---
-title: Connecting Securely
-slug: connecting-securely
+name: connecting-securely
 description: SSH keys, config, agents, tunnels, and remote development without copying private keys. TRIGGER when connecting by SSH, setting up VS Code/Jupyter tunnels, forwarding ports, or troubleshooting authentication.
 related:
   - overview
@@ -9,7 +8,6 @@ related:
   - using-gpus
 updated: 2026-04-28
 ---
-
 # Connecting Securely
 
 Rule: use SSH keys and agent forwarding; never copy private keys onto the cluster.
@@ -29,7 +27,7 @@ ssh-add -l
 ssh hpc
 ```
 
-If you need GitHub from the cluster, use `gh auth login` or carefully scoped SSH agent forwarding. Do not store your laptop private key on GPFS. If `gh` is not installed, see [installing software](./installing-software.md).
+If you need GitHub from the cluster, use `gh auth login` or carefully scoped SSH agent forwarding. Do not store your laptop private key on GPFS. If `gh` is not installed, see [installing software](../installing-software/SKILL.md).
 
 ## Local SSH config
 

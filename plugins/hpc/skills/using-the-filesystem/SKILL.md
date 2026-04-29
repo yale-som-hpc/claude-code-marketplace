@@ -1,6 +1,5 @@
 ---
-title: Using the Filesystem
-slug: using-the-filesystem
+name: using-the-filesystem
 description: Use GPFS, project space, scratch, local temp, and data transfer tools without creating metadata storms. TRIGGER when choosing storage locations, moving files, using scratch/tmp, handling many small files, or diagnosing I/O bottlenecks.
 related:
   - overview
@@ -10,7 +9,6 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Using the Filesystem
 
 Rule: GPFS is good at large files and bad at metadata storms. Prefer fewer, larger files.
@@ -119,7 +117,7 @@ croc send large-file.zip
 croc receive phrase-from-sender
 ```
 
-`croc` may not be installed by default. If `which croc` fails, see [installing software](./installing-software.md) and install it under `~/.local/bin` or `~/go/bin`.
+`croc` may not be installed by default. If `which croc` fails, see [installing software](../installing-software/SKILL.md) and install it under `~/.local/bin` or `~/go/bin`.
 
 Use `rclone` for cloud storage when configured:
 

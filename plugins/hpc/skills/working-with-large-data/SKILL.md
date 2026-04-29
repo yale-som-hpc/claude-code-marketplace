@@ -1,6 +1,5 @@
 ---
-title: Working with Large Data
-slug: working-with-large-data
+name: working-with-large-data
 description: Process data larger than memory with columnar formats, query engines, pushdown, and chunked workflows. TRIGGER when datasets do not fit RAM, CSV/parquet jobs are slow, using DuckDB/Polars/Arrow, or designing chunked data pipelines.
 related:
   - running-python
@@ -10,7 +9,6 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Working with Large Data
 
 Rule: query before loading. Store data in Parquet. Avoid loading full CSVs into memory unless you know they fit.

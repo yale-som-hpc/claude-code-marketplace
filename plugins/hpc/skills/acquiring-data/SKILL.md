@@ -1,6 +1,5 @@
 ---
-title: Acquiring Data
-slug: acquiring-data
+name: acquiring-data
 description: Download, query, scrape, and call APIs without leaking credentials, repeating expensive requests, or getting blocked. TRIGGER when fetching datasets, using APIs, scraping websites, caching downloads, or handling credentials.
 related:
   - using-the-filesystem
@@ -10,7 +9,6 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Acquiring Data
 
 Rule: fetch once, cache raw responses, parse separately, and never put credentials in scripts.
@@ -49,7 +47,7 @@ wget -c -O /gpfs/project/myproject/data/raw/file.zip "https://example.com/file.z
 curl -L --retry 5 --retry-delay 10 -o file.zip "https://example.com/file.zip"
 ```
 
-Use `rsync`/`croc` for collaborator files; see [using the filesystem](./using-the-filesystem.md).
+Use `rsync`/`croc` for collaborator files; see [using the filesystem](../using-the-filesystem/SKILL.md).
 
 ## WRDS pattern
 

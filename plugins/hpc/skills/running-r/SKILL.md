@@ -1,6 +1,5 @@
 ---
-title: Running R
-slug: running-r
+name: running-r
 description: Run R with modules, renv, batch scripts, thread control, and safe library paths. TRIGGER when running R/Rscript/RStudio workflows, creating renv projects, installing R packages, or writing R Slurm jobs.
 related:
   - installing-software
@@ -9,7 +8,6 @@ related:
   - working-with-large-data
 updated: 2026-04-28
 ---
-
 # Running R
 
 Rule: load R explicitly, restore packages deliberately, and never let package installs happen inside large job arrays.

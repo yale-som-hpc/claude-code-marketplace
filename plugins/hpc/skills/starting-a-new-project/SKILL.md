@@ -1,6 +1,5 @@
 ---
-title: Starting a New Project
-slug: starting-a-new-project
+name: starting-a-new-project
 description: Create a research project layout that is reproducible, resumable, and safe for shared HPC use. TRIGGER when starting or reorganizing a project, choosing directories, setting up logs/configs, or making workflows reproducible.
 related:
   - installing-software
@@ -11,7 +10,6 @@ related:
   - acquiring-data
 updated: 2026-04-28
 ---
-
 # Starting a New Project
 
 Rule: make the project understandable to a new RA and restartable by a future you.

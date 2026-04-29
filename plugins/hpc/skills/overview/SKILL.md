@@ -1,6 +1,5 @@
 ---
-title: Overview
-slug: overview
+name: overview
 description: Mental model for using the Yale SOM cluster skillfully. TRIGGER when orienting a new cluster user, deciding where work belongs, or needing the high-level HPC workflow before task-specific guidance.
 related:
   - connecting-securely
@@ -11,7 +10,6 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Overview
 
 Use the cluster as a shared research instrument. Your job is not just to make code run; it is to request the right resources, avoid repeat work, and leave scarce resources available when you are not using them.
@@ -49,17 +47,17 @@ Current as of 2026-04-28. Verify live details with `sinfo -s` when generating pr
 
 ## Which skill to use
 
-- Need to connect, tunnel, or fix SSH? Use [connecting securely](./connecting-securely.md).
-- Need to submit jobs? Use [managing jobs](./managing-jobs.md).
-- Need a GPU? Use [using GPUs](./using-gpus.md) first.
-- Need to move/store files? Use [using the filesystem](./using-the-filesystem.md).
-- Need tools, modules, or binaries? Use [installing software](./installing-software.md).
-- Starting a new repo/project? Use [starting a new project](./starting-a-new-project.md).
-- Need Python? Use [running Python](./running-python.md).
-- Need R? Use [running R](./running-r.md).
-- Need Stata? Use [running Stata](./running-stata.md).
-- Need external data, APIs, WRDS, or scraping? Use [acquiring data](./acquiring-data.md).
-- Need to check whether a job was wasteful? Use [self-diagnosing resource use](./self-diagnosing-resource-use.md).
+- Need to connect, tunnel, or fix SSH? Use [connecting securely](../connecting-securely/SKILL.md).
+- Need to submit jobs? Use [managing jobs](../managing-jobs/SKILL.md).
+- Need a GPU? Use [using GPUs](../using-gpus/SKILL.md) first.
+- Need to move/store files? Use [using the filesystem](../using-the-filesystem/SKILL.md).
+- Need tools, modules, or binaries? Use [installing software](../installing-software/SKILL.md).
+- Starting a new repo/project? Use [starting a new project](../starting-a-new-project/SKILL.md).
+- Need Python? Use [running Python](../running-python/SKILL.md).
+- Need R? Use [running R](../running-r/SKILL.md).
+- Need Stata? Use [running Stata](../running-stata/SKILL.md).
+- Need external data, APIs, WRDS, or scraping? Use [acquiring data](../acquiring-data/SKILL.md).
+- Need to check whether a job was wasteful? Use [self-diagnosing resource use](../self-diagnosing-resource-use/SKILL.md).
 
 ## Default safety rules
 

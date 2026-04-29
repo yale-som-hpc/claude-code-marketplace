@@ -1,6 +1,5 @@
 ---
-title: Parallel Python
-slug: parallel-python
+name: parallel-python
 description: Choose threads, processes, queues, job arrays, and shutdown patterns for Python work on the cluster. TRIGGER when using multiprocessing, concurrent.futures, joblib, Dask/Ray, Slurm arrays, or any Python parallel workload.
 related:
   - running-python
@@ -11,10 +10,9 @@ related:
   - self-diagnosing-resource-use
 updated: 2026-04-28
 ---
-
 # Parallel Python
 
-Rule: match the parallelism model to the bottleneck. Do not add processes, threads, and Slurm arrays on top of each other without a reason. If one process is simply too slow, first check [accelerating Python](./accelerating-python.md).
+Rule: match the parallelism model to the bottleneck. Do not add processes, threads, and Slurm arrays on top of each other without a reason. If one process is simply too slow, first check [accelerating Python](../accelerating-python/SKILL.md).
 
 ## Choose the right tool
 

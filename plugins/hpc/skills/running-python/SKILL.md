@@ -1,6 +1,5 @@
 ---
-title: Running Python
-slug: running-python
+name: running-python
 description: Run Python projects with uv, Slurm, thread control, logging, and safe parallelism. TRIGGER when running .py scripts on the cluster, creating Python environments, writing Python sbatch files, or debugging Python jobs.
 related:
   - installing-software
@@ -12,7 +11,6 @@ related:
   - acquiring-data
 updated: 2026-04-28
 ---
-
 # Running Python
 
 Rule: use a project environment, control threads, log clearly, and make outputs resumable.
@@ -84,7 +82,7 @@ Use logs to know what happened without opening notebooks.
 
 ## Multiprocessing
 
-For nontrivial multiprocessing, producer-consumer queues, process pools, or job-stealing-style work, use [parallel Python](./parallel-python.md).
+For nontrivial multiprocessing, producer-consumer queues, process pools, or job-stealing-style work, use [parallel Python](../parallel-python/SKILL.md).
 
 Minimal rule: match worker count to allocated CPUs.
 

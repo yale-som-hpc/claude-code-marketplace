@@ -1,6 +1,5 @@
 ---
-title: Installing Software
-slug: installing-software
+name: installing-software
 description: Use modules, local binaries, uv, XDG directories, musl builds, and Apptainer without sudo. TRIGGER when installing packages/tools, needing unavailable software, building from source, or using containers on the cluster.
 related:
   - overview
@@ -10,7 +9,6 @@ related:
   - using-the-filesystem
 updated: 2026-04-28
 ---
-
 # Installing Software
 
 Rule: prefer cluster modules for system software, `uv`/`renv` for language packages, and static binaries in `~/.local/bin` for user tools.
@@ -120,7 +118,7 @@ gh auth login
 gh repo clone owner/repo
 ```
 
-If SSH auth fails, see [connecting securely](./connecting-securely.md).
+If SSH auth fails, see [connecting securely](../connecting-securely/SKILL.md).
 
 ## When to use Apptainer
 
