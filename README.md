@@ -31,24 +31,46 @@ The skills are written for two pillars:
 
 You need [Claude Code](https://docs.claude.com/en/docs/claude-code) installed. Skills are loaded by Claude Code's plugin system; nothing runs on the cluster until you ask Claude to do something there.
 
-### User-wide (recommended for most people)
+Pick the path that matches how you use Claude Code.
 
-Available in every Claude Code session, on every project on your laptop:
+### Claude Code CLI (terminal)
+
+Available in every Claude Code session on your laptop. Inside Claude Code:
 
 ```
 /plugin marketplace add yale-som-hpc/claude-code-marketplace
 /plugin install hpc@yale-som-hpc
 ```
 
-Update later with:
+Update later with `/plugin marketplace update yale-som-hpc`.
+
+### Claude Code in VS Code or Cursor
+
+VS Code and Cursor (Cursor is VS Code-based) have a graphical plugin manager. In the Claude Code prompt box, type:
 
 ```
-/plugin marketplace update yale-som-hpc
+/plugins
 ```
 
-### Per-project
+That opens the **Manage plugins** panel. Switch to the **Marketplaces** tab, click **Add marketplace**, and paste:
 
-If you want the skills available only inside a specific repo (e.g. an HPC-using research project), commit the marketplace reference into that repo. Add a `.claude/settings.json` like:
+```
+yale-som-hpc/claude-code-marketplace
+```
+
+Then go back to the **Plugins** tab and install `hpc`. Configuration syncs with the CLI, so the same `/plugin marketplace add ...` command also works inside the VS Code chat box if you prefer typing.
+
+### Claude Code in JetBrains IDEs / Claude Desktop app
+
+These surfaces do not have a graphical plugin manager. Open a terminal (the JetBrains integrated terminal is fine) and use the CLI install path above. Once installed via CLI, the plugin works in every Claude Code session — including the JetBrains and desktop apps — because plugin state is shared per-user.
+
+### Claude Code on the web (claude.ai/code)
+
+The web app does not have a marketplace UI. Use the **per-project** install below; the web app picks up `.claude/settings.json` from any repo it opens.
+
+### Per-project (committed to a repo)
+
+If you want the skills available only inside a specific repo, or you want every collaborator on a project to get them automatically, commit the marketplace reference into the repo. Add a `.claude/settings.json` like:
 
 ```json
 {
@@ -66,7 +88,7 @@ If you want the skills available only inside a specific repo (e.g. an HPC-using 
 }
 ```
 
-Commit `.claude/settings.json` to the repo. Anyone who runs Claude Code in the project will have the `hpc` plugin enabled automatically the first time they trust the marketplace.
+Commit `.claude/settings.json`. Anyone who runs Claude Code in the project — CLI, VS Code, Cursor, web — will have the `hpc` plugin enabled automatically the first time they trust the marketplace.
 
 ### Verify
 
