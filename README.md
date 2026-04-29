@@ -161,4 +161,4 @@ If you change an sbatch template, a `module load` line, a partition name, or a p
 
 ## License
 
-These skills are distributed for use by the Yale SOM community and collaborators. See [LICENSE](LICENSE) if present.
+Released into the public domain under [The Unlicense](LICENSE).
