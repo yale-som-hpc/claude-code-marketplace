@@ -17,6 +17,10 @@ Rule: hold a GPU only while GPU code is actively running. Do CPU preprocessing, 
 
 GPUs are the scarcest resource on the cluster. An idle interactive GPU session — `srun --pty bash` left open while you go to lunch — is blocking another user's job right now. Cancel it. The H100 node has 4 GPUs total for the whole cluster; treat it accordingly.
 
+## Account for every GPU-hour
+
+Treat each requested GPU-hour as compute somebody else cannot use. The cluster has finite GPUs, the H100 partition has only four cards total, and per-user GPU caps are likely to be enforced before any other resource. The way to stay ahead of that is to cancel idle GPU jobs the instant you notice them — `scancel JOBID` — and never request more GPUs than your code uses.
+
 ## Do you need a GPU?
 
 Use a GPU for:

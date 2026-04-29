@@ -48,11 +48,18 @@ uv run python src/analysis.py
 
 ## Interactive session
 
-Use for debugging, not long unattended work:
+Use only for debugging, never for long unattended work. Interactive jobs hold resources whether or not you are typing — a forgotten `srun --pty bash` can sit on a GPU all weekend.
 
 ```bash
-srun --partition=cpunormal --cpus-per-task=4 --mem=16G --time=01:00:00 --pty bash
+srun --partition=cpunormal --cpus-per-task=2 --mem=8G --time=01:00:00 --pty bash
 ```
+
+Rules:
+
+- Smallest allocation that lets you debug. Two CPUs and 8 GB is usually enough.
+- `--time` measured in hours, not days. Re-request if you need more.
+- Exit (`exit` or `Ctrl-D`) the moment you are done. Do not minimize the terminal and walk away.
+- Anything that can run unattended belongs in `sbatch`, not `srun --pty`.
 
 ## Job arrays
 
@@ -93,7 +100,19 @@ Use `afterany` for cleanup or restart logic that should run even after failure.
 
 ## Time limits
 
-Shorter jobs often schedule faster because Slurm can backfill them. If work is resumable, prefer 2–4 hour chunks over multi-day jobs.
+Shorter jobs often schedule faster because Slurm can backfill them into idle slots between bigger jobs. Multi-day jobs queue behind everyone. If work is resumable, prefer 2–4 hour chunks; with skip-if-exists outputs, a killed job picks up where it left off on resubmit.
+
+## Right-size before submitting
+
+Do not pad requests "just in case." Over-requesting blocks scheduling for everyone, and the cluster is moving toward enforced per-user caps. The right-sizing loop:
+
+1. Submit a 10-minute test job with a small input.
+2. Run `seff JOBID` after it finishes.
+3. Set the real job's `--mem` to ~1.5–2× the test's `MaxRSS`, not 10×.
+4. Set `--cpus-per-task` to what your code actually parallelizes over (`SLURM_CPUS_PER_TASK` controls BLAS, multiprocessing, `setDTthreads`, `set processors`).
+5. Set `--time` from a sample-data extrapolation, not from "what if it takes a week."
+
+See [self-diagnosing resource use](../self-diagnosing-resource-use/SKILL.md) for the post-job checks that drive this loop.
 
 ## Before scaling up
 

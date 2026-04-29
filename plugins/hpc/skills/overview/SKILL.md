@@ -72,6 +72,18 @@ Everything in these skills supports one of two goals:
 - Make outputs resumable (skip-if-exists, atomic temp+rename) — `KillWait=30` is too short for clean shutdown.
 - Inspect resource usage after every serious job.
 
+## Treat caps as if they exist
+
+Today the cluster has light enforcement of per-user resource caps, but that is not a design choice — it is a courtesy. Other clusters (Grace, most NSF/DOE systems) have hard partition caps, monthly compute budgets, and tight interactive limits. SOM HPC is moving in that direction.
+
+Operate as if the rules already apply:
+
+- Request what you need, not what feels safe. Aim for ~1.5–2× observed peak memory, not 10×.
+- Prefer batch over interactive. Interactive sessions should be the smallest allocation that lets you debug, with a time limit measured in hours, not days. Never leave one open overnight.
+- Prefer many short jobs (1–4 hours) over one multi-day job. Short jobs backfill into idle slots; long jobs queue behind everyone.
+- Cancel jobs as soon as they are wedged or done. `scancel JOBID`.
+- Treat every requested GPU-hour as compute someone else cannot use.
+
 ## Minimal safe Slurm shape
 
 ```bash

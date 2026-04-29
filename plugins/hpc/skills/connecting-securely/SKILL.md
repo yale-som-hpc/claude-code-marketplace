@@ -91,10 +91,10 @@ git clone git@github.com:owner/repo.git
 
 ## Jupyter tunnel pattern
 
-On the cluster, allocate a node and start Jupyter:
+On the cluster, allocate a small node and start Jupyter. Use the smallest allocation that fits your data, with an explicit short time limit — a tunneled Jupyter session is still an interactive job and holds those resources until you `scancel` it or the time limit hits.
 
 ```bash
-srun --partition=cpunormal --cpus-per-task=4 --mem=16G --time=04:00:00 --pty bash
+srun --partition=cpunormal --cpus-per-task=2 --mem=8G --time=02:00:00 --pty bash
 node=$(hostname)
 echo "$node"
 jupyter notebook --no-browser --port=8888 --ip=127.0.0.1
@@ -106,7 +106,7 @@ On your laptop, tunnel to the allocated node. Replace `c018` with the hostname p
 ssh -NL 9999:localhost:8888 c018
 ```
 
-Open `http://localhost:9999`.
+Open `http://localhost:9999`. When you are done, exit the notebook and the `srun` shell. Do not leave a Jupyter session running overnight.
 
 ## VS Code / Cursor
 
