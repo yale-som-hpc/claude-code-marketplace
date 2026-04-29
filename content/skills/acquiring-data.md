@@ -1,7 +1,7 @@
 ---
 title: Acquiring Data
 slug: acquiring-data
-description: Download, query, scrape, and call APIs without leaking credentials, repeating expensive requests, or getting blocked.
+description: Download, query, scrape, and call APIs without leaking credentials, repeating expensive requests, or getting blocked. TRIGGER when fetching datasets, using APIs, scraping websites, caching downloads, or handling credentials.
 related:
   - using-the-filesystem
   - working-with-large-data

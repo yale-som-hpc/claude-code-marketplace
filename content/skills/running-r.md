@@ -1,7 +1,7 @@
 ---
 title: Running R
 slug: running-r
-description: Run R with modules, renv, batch scripts, thread control, and safe library paths.
+description: Run R with modules, renv, batch scripts, thread control, and safe library paths. TRIGGER when running R/Rscript/RStudio workflows, creating renv projects, installing R packages, or writing R Slurm jobs.
 related:
   - installing-software
   - managing-jobs

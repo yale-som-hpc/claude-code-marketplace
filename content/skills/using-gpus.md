@@ -1,7 +1,7 @@
 ---
 title: Using GPUs
 slug: using-gpus
-description: Request GPUs only when code actively uses them, and diagnose idle allocations.
+description: Request GPUs only when code actively uses them, and diagnose idle allocations. TRIGGER when using CUDA, PyTorch, TensorFlow, JAX, RAPIDS/CuPy, transformer/LLM inference, GPU Slurm requests, or nvidia-smi.
 related:
   - managing-jobs
   - running-python

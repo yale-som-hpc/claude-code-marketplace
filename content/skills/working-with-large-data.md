@@ -1,7 +1,7 @@
 ---
 title: Working with Large Data
 slug: working-with-large-data
-description: Process data larger than memory with columnar formats, query engines, pushdown, and chunked workflows.
+description: Process data larger than memory with columnar formats, query engines, pushdown, and chunked workflows. TRIGGER when datasets do not fit RAM, CSV/parquet jobs are slow, using DuckDB/Polars/Arrow, or designing chunked data pipelines.
 related:
   - running-python
   - running-r

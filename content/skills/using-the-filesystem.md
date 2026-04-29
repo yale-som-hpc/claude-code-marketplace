@@ -1,7 +1,7 @@
 ---
 title: Using the Filesystem
 slug: using-the-filesystem
-description: Use GPFS, project space, scratch, local temp, and data transfer tools without creating metadata storms.
+description: Use GPFS, project space, scratch, local temp, and data transfer tools without creating metadata storms. TRIGGER when choosing storage locations, moving files, using scratch/tmp, handling many small files, or diagnosing I/O bottlenecks.
 related:
   - overview
   - working-with-large-data

@@ -1,7 +1,7 @@
 ---
 title: Self-Diagnosing Resource Use
 slug: self-diagnosing-resource-use
-description: Check whether jobs used requested CPUs, memory, GPUs, filesystem, and queue time skillfully.
+description: Check whether jobs used requested CPUs, memory, GPUs, filesystem, and queue time skillfully. TRIGGER when a job is slow, killed, pending, idle, over-requested, under-requested, or needs post-run resource diagnosis.
 related:
   - managing-jobs
   - using-gpus

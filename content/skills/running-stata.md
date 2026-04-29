@@ -1,7 +1,7 @@
 ---
 title: Running Stata
 slug: running-stata
-description: Run Stata batch jobs with logs, scratch temp space, CPU matching, and license courtesy.
+description: Run Stata batch jobs with logs, scratch temp space, CPU matching, and license courtesy. TRIGGER when running Stata do-files, choosing Stata/MP cores, writing Stata sbatch scripts, or diagnosing Stata logs/licenses.
 related:
   - managing-jobs
   - using-the-filesystem

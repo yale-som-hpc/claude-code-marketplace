@@ -1,7 +1,7 @@
 ---
 title: Installing Software
 slug: installing-software
-description: Use modules, local binaries, uv, XDG directories, musl builds, and Apptainer without sudo.
+description: Use modules, local binaries, uv, XDG directories, musl builds, and Apptainer without sudo. TRIGGER when installing packages/tools, needing unavailable software, building from source, or using containers on the cluster.
 related:
   - overview
   - running-python

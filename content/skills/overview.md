@@ -1,7 +1,7 @@
 ---
 title: Overview
 slug: overview
-description: Mental model for using the Yale SOM cluster skillfully.
+description: Mental model for using the Yale SOM cluster skillfully. TRIGGER when orienting a new cluster user, deciding where work belongs, or needing the high-level HPC workflow before task-specific guidance.
 related:
   - connecting-securely
   - managing-jobs

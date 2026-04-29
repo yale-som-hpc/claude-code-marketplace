@@ -1,7 +1,7 @@
 ---
 title: Connecting Securely
 slug: connecting-securely
-description: SSH keys, config, agents, tunnels, and remote development without copying private keys.
+description: SSH keys, config, agents, tunnels, and remote development without copying private keys. TRIGGER when connecting by SSH, setting up VS Code/Jupyter tunnels, forwarding ports, or troubleshooting authentication.
 related:
   - overview
   - managing-jobs

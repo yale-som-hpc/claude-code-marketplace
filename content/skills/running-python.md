@@ -1,7 +1,7 @@
 ---
 title: Running Python
 slug: running-python
-description: Run Python projects with uv, Slurm, thread control, logging, and safe parallelism.
+description: Run Python projects with uv, Slurm, thread control, logging, and safe parallelism. TRIGGER when running .py scripts on the cluster, creating Python environments, writing Python sbatch files, or debugging Python jobs.
 related:
   - installing-software
   - managing-jobs

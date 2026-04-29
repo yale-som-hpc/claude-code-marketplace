@@ -1,7 +1,7 @@
 ---
 title: Parallel Python
 slug: parallel-python
-description: Choose threads, processes, queues, job arrays, and shutdown patterns for Python work on the cluster.
+description: Choose threads, processes, queues, job arrays, and shutdown patterns for Python work on the cluster. TRIGGER when using multiprocessing, concurrent.futures, joblib, Dask/Ray, Slurm arrays, or any Python parallel workload.
 related:
   - running-python
   - accelerating-python

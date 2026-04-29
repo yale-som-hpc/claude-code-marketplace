@@ -1,7 +1,7 @@
 ---
 title: Accelerating Python
 slug: accelerating-python
-description: Speed up Python by choosing better algorithms, vectorization, DuckDB/Polars, Numba, or GPUs before adding blind multiprocessing.
+description: Speed up Python by choosing better algorithms, vectorization, DuckDB/Polars, Numba, or GPUs before adding blind multiprocessing. TRIGGER when Python jobs are slow, CPU-bound, memory-heavy, or considering parallelism/GPU acceleration.
 related:
   - running-python
   - parallel-python
