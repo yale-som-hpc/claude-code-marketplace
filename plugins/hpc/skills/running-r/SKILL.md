@@ -6,11 +6,34 @@ related:
   - managing-jobs
   - using-the-filesystem
   - working-with-large-data
-updated: 2026-04-28
+updated: 2026-04-29
 ---
 # Running R
 
 Rule: load R explicitly, restore packages deliberately, and never let package installs happen inside large job arrays.
+
+## Tooling defaults
+
+Slightly opinionated picks for new R projects on the cluster:
+
+- **`rig`** for managing R versions across projects. The cluster module gives you one R; `rig` lets you pin per-project.
+- **`renv`** for project libraries. `renv.lock` is the R analogue of `uv.lock` — it is what makes runs reproducible from login node to compute node.
+- **`pak`** as the installer behind `renv` for fast parallel installs.
+- **`lintr`** + **`styler`** for static checks and formatting; **`testthat`** for tests. Install once at project setup.
+- **`optparse`** for CLI scripts (one-file batch entry points like the pattern below).
+- **Native pipe `|>`** unless you specifically need magrittr's `%>%` placeholders.
+
+## Style defaults
+
+For the audience that is new to R — these are not stylistic preferences, they are the conventions that will make your code readable to anyone who comes after you (including future-you):
+
+- `snake_case` for variables and functions; reserve `CamelCase` for S4/R6 classes.
+- `<-` for assignment, not `=`. (Reserve `=` for named function arguments.)
+- All `library()` calls at the top of the script.
+- File paths via `here::here()` or explicit project paths; do not hardcode laptop paths.
+- Always set `set.seed()` for stochastic work.
+- Always use named arguments where the meaning is not obvious: `mean(x, na.rm = TRUE)`, not `mean(x, T)`.
+- Smoke test on a small slice of real data before submitting a full cluster job. This is genuinely the fastest debugging loop you have.
 
 ## Load R
 
@@ -50,7 +73,13 @@ For shared projects, set a project library path in `.Rprofile`:
 Sys.setenv(RENV_PATHS_LIBRARY = "/gpfs/project/myproject/environments/renv/library")
 ```
 
-Run `renv::restore()` once during setup, not inside hundreds of jobs.
+Run `renv::restore()` once during setup, not inside hundreds of jobs. Mutating the project library inside a Slurm array is a metadata storm and a reproducibility hazard.
+
+## Data manipulation defaults
+
+- **tidyverse (`dplyr`, `tidyr`, `readr`)** is the right default for ordinary research code — readable, well-documented, easy to share.
+- **`data.table`** (or `dtplyr` for dplyr syntax with data.table speed) when you have actually benchmarked memory or runtime as the bottleneck, typically on data >1GB or in a hot inner loop. Switch because of measured pain, not as an identity marker.
+- **`arrow` + Parquet** for anything you store on `/gpfs/project/...` and reuse. One Parquet beats many CSVs for both speed and GPFS metadata health.
 
 ## Safe R Slurm template
 
@@ -73,8 +102,10 @@ export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 
 cd /gpfs/project/myproject/code
-Rscript src/main.R
+srun Rscript src/main.R
 ```
+
+Use `srun Rscript` (not bare `Rscript`) for the same reason as Python: signals from `--signal=USR1@N` reach the job's main process, not just the batch shell.
 
 ## CLI script pattern
 
@@ -138,15 +169,20 @@ Install/restore once, then run many jobs.
 
 - [ ] Job script loads R module explicitly.
 - [ ] `renv.lock` is committed.
-- [ ] `renv::restore()` is not inside job arrays.
+- [ ] `renv::restore()` is run once at setup, not inside job arrays.
 - [ ] Batch scripts accept input/output arguments instead of hardcoded paths.
-- [ ] BLAS/OpenMP thread variables are set.
-- [ ] `data.table` threads match allocated CPUs.
+- [ ] BLAS/OpenMP thread variables are set with `${SLURM_CPUS_PER_TASK:-1}`.
+- [ ] `data.table::setDTthreads(n_cpus)` matches allocated CPUs.
+- [ ] Long jobs use `srun Rscript ...`.
 - [ ] Outputs are resumable and atomically written.
 
 ## Further reading
 
 - [renv documentation](https://rstudio.github.io/renv/) — `init`, `snapshot`, `restore`, project libraries.
+- [rig](https://github.com/r-lib/rig) — R version manager.
+- [pak](https://pak.r-lib.org/) — fast parallel package installer.
+- [tidyverse style guide](https://style.tidyverse.org/) — the conventions named above, in depth.
 - [data.table reference](https://rdatatable.gitlab.io/data.table/) — `setDTthreads`, `fread`, `:=`, joins.
+- [dtplyr](https://dtplyr.tidyverse.org/) — dplyr syntax over data.table.
 - [Apache Arrow for R](https://arrow.apache.org/docs/r/) — `open_dataset`, Parquet I/O, dplyr verbs.
 - [Lmod user guide](https://lmod.readthedocs.io/en/latest/) — `module load r`, `module purge`.

@@ -7,7 +7,7 @@ related:
   - acquiring-data
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-04-28
+updated: 2026-04-29
 ---
 # Using the Filesystem
 
@@ -92,16 +92,28 @@ df.to_parquet(tmp)
 tmp.rename(output)
 ```
 
-## Local temp pattern
+## Per-job temp directory on the compute node
+
+For high-I/O work, stage inputs onto the compute node's local `/tmp`, work there, and copy final outputs back to GPFS. This shifts metadata churn off the shared filesystem and is much faster than running the same loop directly against `/gpfs`.
 
 ```bash
-workdir=$(mktemp -d /tmp/${USER}_${SLURM_JOB_ID}_XXXXXX)
-trap 'rm -rf "$workdir"' EXIT
+# Compute node /tmp is local, ephemeral, and small. Use it for one job at a time.
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/job_${SLURM_JOB_ID:-local}.XXXXXX")
+export TMPDIR="$workdir"                  # so libraries that honor TMPDIR write here too
+trap 'rm -rf "$workdir"' EXIT             # clean even on crash, signal, or time-limit kill
 
 cp /gpfs/project/myproject/data/input.parquet "$workdir"/
-uv run python src/process.py --input "$workdir/input.parquet" --output "$workdir/output.parquet"
+srun .venv/bin/python src/process.py \
+    --input "$workdir/input.parquet" \
+    --output "$workdir/output.parquet"
 cp "$workdir/output.parquet" /gpfs/project/myproject/output/
 ```
+
+Notes:
+
+- `mktemp -d "${TMPDIR:-/tmp}/..."` (with a path template) works the same on Linux and macOS. Avoid `mktemp -t`; the `-t` semantics differ across systems.
+- Setting `TMPDIR` makes Python's `tempfile`, R's `tempdir()`, Polars/Arrow scratch, and most well-behaved tools write to your per-job directory.
+- The `trap ... EXIT` runs on normal exits and on SIGTERM (the first signal Slurm sends at the time limit), so the workdir is cleaned in the common cases. SIGKILL bypasses traps; if a job is force-killed, the directory survives on the node's local disk and ages out on its own.
 
 ## Moving files
 

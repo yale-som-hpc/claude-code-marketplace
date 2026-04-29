@@ -9,7 +9,7 @@ related:
   - self-diagnosing-resource-use
   - using-the-filesystem
   - acquiring-data
-updated: 2026-04-28
+updated: 2026-04-29
 ---
 # Using GPUs
 
@@ -57,7 +57,8 @@ export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 
 nvidia-smi
-uv run python train.py
+# Environment was created during setup with: uv sync --frozen
+srun .venv/bin/python train.py
 ```
 
 Only request multiple GPUs if the code explicitly uses multiple GPUs.
@@ -68,7 +69,7 @@ Bad:
 
 ```bash
 #SBATCH --gres=gpu:1
-uv run python download_tokenize_clean_and_train.py
+srun .venv/bin/python download_tokenize_clean_and_train.py
 ```
 
 Good:
