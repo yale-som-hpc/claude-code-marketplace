@@ -21,7 +21,7 @@ Rule: use a project environment, control threads, log clearly, and make outputs 
 ```bash
 cd /gpfs/project/myproject/code
 uv init --app
-uv add pandas pyarrow duckdb
+uv add polars pyarrow duckdb
 uv sync
 ```
 

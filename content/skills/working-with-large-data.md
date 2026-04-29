@@ -13,7 +13,7 @@ updated: 2026-04-28
 
 # Working with Large Data
 
-Rule: query before loading. Store data in Parquet. Avoid loading full CSVs into pandas/R unless you know they fit.
+Rule: query before loading. Store data in Parquet. Avoid loading full CSVs into memory unless you know they fit.
 
 ## Preferred formats
 

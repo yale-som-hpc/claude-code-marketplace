@@ -108,7 +108,7 @@ Then use it per project:
 ```bash
 cd /gpfs/project/myproject/code
 uv init --app
-uv add pandas pyarrow duckdb
+uv add polars pyarrow duckdb
 uv sync
 ```
 

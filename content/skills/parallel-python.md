@@ -38,6 +38,26 @@ n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
 
 If Slurm gives you 4 CPUs, do not start 32 workers. If each worker calls BLAS/NumPy, also set thread environment variables in the Slurm script.
 
+## Start methods
+
+Choose multiprocessing start methods explicitly with `get_context()`.
+
+```python
+import multiprocessing as mp
+
+ctx = mp.get_context("spawn")
+queue = ctx.Queue()
+process = ctx.Process(target=worker, args=(queue,))
+```
+
+Use:
+
+- `spawn` for CUDA/PyTorch or when parent process has active threads/open handles.
+- `forkserver` as a safer general-purpose alternative to `fork`.
+- `fork` only when you understand the inherited state and do not use CUDA or active threads.
+
+Prefer `get_context()` over global `set_start_method()` so libraries and tests stay composable.
+
 ## Safe process pool
 
 Use processes for CPU-bound Python functions:
@@ -79,7 +99,21 @@ with Pool(processes=n_workers) as pool:
         print(f"done {done_path}", flush=True)
 ```
 
-Use larger `chunksize` only when each task is tiny and overhead dominates.
+Use larger `chunksize` only when each task is tiny and overhead dominates. For uniform work, start with `len(items) // n_workers`; for uneven work, use smaller chunks.
+
+If worker setup is expensive, use a per-process initializer:
+
+```python
+_model = None
+
+def init_worker():
+    global _model
+    _model = load_model_once()
+
+with ProcessPoolExecutor(max_workers=n_workers, initializer=init_worker) as pool:
+    for result in pool.map(classify_with_global_model, batches, chunksize=16):
+        write_result(result)
+```
 
 ## Producer-consumer pipeline
 
@@ -167,6 +201,44 @@ for p in workers:
 
 Missing `task_done()` is a common cause of jobs hanging forever in `join()`.
 
+## Process-safe logging
+
+Python logging is thread-safe, but multiple processes writing to the same stream or file can garble logs. Funnel records through one listener.
+
+```python
+import logging
+import multiprocessing as mp
+from logging.handlers import QueueHandler, QueueListener
+
+log_queue = mp.Queue()
+listener = QueueListener(log_queue, logging.StreamHandler())
+listener.start()
+
+logger = logging.getLogger("worker")
+logger.addHandler(QueueHandler(log_queue))
+logger.setLevel(logging.INFO)
+```
+
+Set up the `QueueHandler` inside each worker if workers are spawned.
+
+## Debug stuck jobs
+
+Enable fault dumps early:
+
+```python
+import faulthandler
+
+faulthandler.enable()
+```
+
+If allowed, attach to a running Python process:
+
+```bash
+py-spy dump --pid PID
+```
+
+Use logs for queue depth, worker start/finish, and output counts. A silent queue pipeline is painful to debug.
+
 ## Handle interruption
 
 Slurm may kill jobs at the time limit. On this cluster, the final grace period is short, so design for frequent output and fast shutdown.
@@ -233,4 +305,6 @@ Choose one main layer of parallelism.
 - [ ] One writer owns output serialization.
 - [ ] Shutdown uses sentinels or signal flags, not abandoned workers.
 - [ ] Outputs are written incrementally and atomically.
+- [ ] Multiprocessing start method is explicit when CUDA/threads/open handles are involved.
+- [ ] Process logs go through one listener or separate per-worker files.
 - [ ] Nested parallelism is intentional and documented.
