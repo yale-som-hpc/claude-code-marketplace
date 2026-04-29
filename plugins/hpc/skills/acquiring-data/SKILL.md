@@ -1,6 +1,6 @@
 ---
 name: acquiring-data
-description: Download, query, scrape, and call APIs without leaking credentials, repeating expensive requests, or getting blocked. TRIGGER when fetching datasets, using APIs, scraping websites, caching downloads, or handling credentials.
+description: Download, query, scrape, and call APIs from the Yale SOM HPC cluster without leaking credentials, repeating expensive requests, or getting the cluster's outbound IP blocked. TRIGGER when fetching datasets onto /gpfs, calling WRDS/REST APIs from the Yale SOM HPC cluster, scraping from the cluster, caching downloads on the cluster, or handling credentials on the cluster.
 related:
   - using-the-filesystem
   - working-with-large-data

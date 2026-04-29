@@ -1,6 +1,6 @@
 ---
 name: managing-jobs
-description: Submit, monitor, cancel, array, and chain Slurm jobs safely. TRIGGER when writing sbatch scripts, choosing resources/partitions, using job arrays, dependencies, sacct/squeue, or cancelling jobs.
+description: Submit, monitor, cancel, array, and chain Slurm jobs on the Yale SOM HPC cluster. TRIGGER when writing sbatch scripts for the Yale SOM HPC cluster, choosing cluster partitions/resources, using job arrays or dependencies on the cluster, or running sacct/squeue/scancel against cluster jobs.
 related:
   - overview
   - self-diagnosing-resource-use

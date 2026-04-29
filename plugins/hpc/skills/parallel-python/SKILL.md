@@ -1,6 +1,6 @@
 ---
 name: parallel-python
-description: Choose threads, processes, queues, job arrays, and shutdown patterns for Python work on the cluster. TRIGGER when using multiprocessing, concurrent.futures, joblib, Dask/Ray, Slurm arrays, or any Python parallel workload.
+description: Choose threads, processes, queues, and Slurm arrays for Python on the Yale SOM HPC cluster. TRIGGER when running multiprocessing/concurrent.futures/joblib/Dask/Ray Python work on the Yale SOM HPC cluster, writing Slurm array jobs there, or right-sizing workers to SLURM_CPUS_PER_TASK on the cluster.
 related:
   - running-python
   - accelerating-python

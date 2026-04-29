@@ -1,6 +1,6 @@
 ---
 name: using-gpus
-description: Request GPUs only when code actively uses them, and diagnose idle allocations. TRIGGER when using CUDA, PyTorch, TensorFlow, JAX, RAPIDS/CuPy, transformer/LLM inference, GPU Slurm requests, or nvidia-smi.
+description: Request GPUs on the Yale SOM HPC cluster only when code actively uses them, and diagnose idle allocations. TRIGGER when writing GPU sbatch scripts for the Yale SOM HPC cluster, running CUDA/PyTorch/JAX/TensorFlow/RAPIDS jobs there, or checking nvidia-smi inside a cluster GPU allocation.
 related:
   - managing-jobs
   - running-python

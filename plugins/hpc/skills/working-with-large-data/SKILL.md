@@ -1,6 +1,6 @@
 ---
 name: working-with-large-data
-description: Process data larger than memory with columnar formats, query engines, pushdown, and chunked workflows. TRIGGER when datasets do not fit RAM, CSV/parquet jobs are slow, using DuckDB/Polars/Arrow, or designing chunked data pipelines.
+description: Process data larger than memory on the Yale SOM HPC cluster with Parquet, DuckDB, Polars, and Arrow. TRIGGER when datasets on /gpfs do not fit a Slurm job's RAM, CSV/Parquet jobs on the Yale SOM HPC cluster are slow, or designing chunked data pipelines for cluster Slurm jobs.
 related:
   - running-python
   - running-r

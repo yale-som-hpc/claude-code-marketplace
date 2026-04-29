@@ -1,6 +1,6 @@
 ---
 name: self-diagnosing-resource-use
-description: Check whether jobs used requested CPUs, memory, GPUs, filesystem, and queue time skillfully. TRIGGER when a job is slow, killed, pending, idle, over-requested, under-requested, or needs post-run resource diagnosis.
+description: Diagnose whether a Yale SOM HPC cluster Slurm job used its requested CPUs, memory, GPUs, and time wisely, then right-size the next request. TRIGGER when a Slurm job on the Yale SOM HPC cluster is slow/killed/pending/idle/over-requested or needs post-run resource diagnosis.
 related:
   - managing-jobs
   - using-gpus

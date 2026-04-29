@@ -1,6 +1,6 @@
 ---
 name: starting-a-new-project
-description: Create a research project layout that is reproducible, resumable, and safe for shared HPC use. TRIGGER when starting or reorganizing a project, choosing directories, setting up logs/configs, or making workflows reproducible.
+description: Create a research project layout under /gpfs/project on the Yale SOM HPC cluster — reproducible, resumable, safe for shared use. TRIGGER when starting or reorganizing a project on the Yale SOM HPC cluster, choosing GPFS directories, or setting up cluster-side logs, lockfiles, and Slurm scripts.
 related:
   - installing-software
   - managing-jobs

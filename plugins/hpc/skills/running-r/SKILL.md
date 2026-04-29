@@ -1,6 +1,6 @@
 ---
 name: running-r
-description: Run R with modules, renv, batch scripts, thread control, and safe library paths. TRIGGER when running R/Rscript/RStudio workflows, creating renv projects, installing R packages, or writing R Slurm jobs.
+description: Run R on the Yale SOM HPC cluster with Lmod modules, renv, batch scripts, and BLAS/OpenMP thread control. TRIGGER when writing R Slurm jobs on the Yale SOM HPC cluster, using renv on the cluster, installing R packages on the cluster, or running Rscript in batch mode there.
 related:
   - installing-software
   - managing-jobs

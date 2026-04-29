@@ -1,6 +1,6 @@
 ---
 name: using-the-filesystem
-description: Use GPFS, project space, scratch, local temp, and data transfer tools without creating metadata storms. TRIGGER when choosing storage locations, moving files, using scratch/tmp, handling many small files, or diagnosing I/O bottlenecks.
+description: Use GPFS on the Yale SOM HPC cluster (/gpfs/project, /gpfs/scratch60, compute-node /tmp) without metadata storms. TRIGGER when choosing storage locations on the Yale SOM HPC cluster, moving files to/from GPFS, using cluster scratch/tmp, handling many small files on the cluster, or diagnosing GPFS I/O bottlenecks.
 related:
   - overview
   - working-with-large-data

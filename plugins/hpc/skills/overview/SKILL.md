@@ -1,6 +1,6 @@
 ---
 name: overview
-description: Mental model for using the Yale SOM cluster skillfully. TRIGGER when orienting a new cluster user, deciding where work belongs, or needing the high-level HPC workflow before task-specific guidance.
+description: Mental model for the Yale SOM HPC cluster — login vs compute nodes, partitions, GPFS, Slurm, default safety rules. TRIGGER when the user is working on the Yale SOM HPC cluster and needs orientation, is deciding where work belongs on the cluster, or needs high-level HPC workflow guidance before reaching for a task-specific skill.
 related:
   - connecting-securely
   - managing-jobs

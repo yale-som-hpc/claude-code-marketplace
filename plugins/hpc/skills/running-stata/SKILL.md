@@ -1,6 +1,6 @@
 ---
 name: running-stata
-description: Run Stata batch jobs with logs, scratch temp space, CPU matching, and license courtesy. TRIGGER when running Stata do-files, choosing Stata/MP cores, writing Stata sbatch scripts, or diagnosing Stata logs/licenses.
+description: Run Stata batch jobs on the Yale SOM HPC cluster with logs, scratch temp, CPU matching, and license courtesy. TRIGGER when writing Stata sbatch scripts for the Yale SOM HPC cluster, choosing Stata/MP cores there, or diagnosing Stata batch jobs/licenses on the cluster.
 related:
   - managing-jobs
   - using-the-filesystem

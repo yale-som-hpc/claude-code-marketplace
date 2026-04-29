@@ -1,6 +1,6 @@
 ---
 name: installing-software
-description: Use modules, local binaries, uv, XDG directories, musl builds, and Apptainer without sudo. TRIGGER when installing packages/tools, needing unavailable software, building from source, or using containers on the cluster.
+description: Install software on the Yale SOM HPC cluster with Lmod modules, uv, static/musl binaries, and Apptainer — no sudo. TRIGGER when installing tools or packages on the Yale SOM HPC cluster, hitting GLIBC errors on cluster nodes, building from source on the cluster, or using Apptainer containers there.
 related:
   - overview
   - running-python

@@ -1,6 +1,6 @@
 ---
 name: accelerating-python
-description: Speed up Python by choosing better algorithms, vectorization, DuckDB/Polars, Numba, or GPUs before adding blind multiprocessing. TRIGGER when Python jobs are slow, CPU-bound, memory-heavy, or considering parallelism/GPU acceleration.
+description: Speed up Python on the Yale SOM HPC cluster with profiling, DuckDB/Polars/Numba, and right-sized parallelism before reaching for multiprocessing or GPUs. TRIGGER when a Python Slurm job on the Yale SOM HPC cluster is slow/CPU-bound/memory-heavy, or when considering parallelism or GPU acceleration on the cluster.
 related:
   - running-python
   - parallel-python

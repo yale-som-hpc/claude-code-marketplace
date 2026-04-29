@@ -1,6 +1,6 @@
 ---
 name: connecting-securely
-description: SSH keys, config, agents, tunnels, and remote development without copying private keys. TRIGGER when connecting by SSH, setting up VS Code/Jupyter tunnels, forwarding ports, or troubleshooting authentication.
+description: Connect to the Yale SOM HPC cluster (hpc.som.yale.edu) over SSH with keys, agents, jump hosts, and tunnels — no copied private keys. TRIGGER when SSHing to the Yale SOM HPC cluster, setting up VS Code/Jupyter tunnels to a cluster compute node, forwarding ports through the cluster login node, or troubleshooting cluster SSH/agent auth.
 related:
   - overview
   - managing-jobs
