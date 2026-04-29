@@ -25,6 +25,9 @@ Rule: run Stata in batch jobs, write logs, put temp files on scratch, and reques
 
 set -euo pipefail
 
+module purge
+module load stata
+
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}

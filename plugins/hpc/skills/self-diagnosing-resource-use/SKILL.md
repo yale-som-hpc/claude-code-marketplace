@@ -19,7 +19,7 @@ Rule: after every serious job, check what you actually used and right-size the n
 sacct -j JOBID --format=JobID,JobName,Elapsed,AllocCPUS,TotalCPU,MaxRSS,State
 ```
 
-If available:
+For a friendlier summary:
 
 ```bash
 seff JOBID
@@ -92,7 +92,7 @@ echo "=== Job accounting ==="
 sacct -j "$jobid" --format=JobID,JobName,Elapsed,AllocCPUS,TotalCPU,MaxRSS,State
 
 echo ""
-echo "=== seff, if available ==="
+echo "=== seff ==="
 seff "$jobid" 2>/dev/null || true
 
 echo ""

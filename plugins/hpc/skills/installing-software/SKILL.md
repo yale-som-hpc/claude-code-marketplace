@@ -122,6 +122,12 @@ If SSH auth fails, see [connecting securely](../connecting-securely/SKILL.md).
 
 ## When to use Apptainer
 
+Apptainer is not in the default PATH. Load the module first:
+
+```bash
+module load apptainer
+```
+
 Use Apptainer when:
 
 - binaries need incompatible system libraries

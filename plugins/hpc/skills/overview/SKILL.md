@@ -29,17 +29,18 @@ Use the cluster as a shared research instrument. Your job is not just to make co
 Current as of 2026-04-28. Verify live details with `sinfo -s` when generating production instructions.
 
 - Scheduler: Slurm.
-- Module system: Lmod + Spack.
+- Module system: Lmod. Modules are Spack-built, but users only run `module load`, never `spack` directly.
 - Main partitions: `default_queue`, `cpunormal`, `gpunormal`, `h100`, `build`.
-- `default_queue` has a 4-hour time limit and is good for short tests.
-- `cpunormal` is for CPU jobs.
-- `gpunormal` is for RTX 8000/A100 GPU jobs.
-- `h100` is for the H100 node.
+- `default_queue` has a 1-hour default and a 4-hour max time limit. It spans `b[001-002]` and `c[018-021]`, so a job can land on a build node with an A40 GPU or on a CPU-only node.
+- `cpunormal` is for CPU jobs (`c[018-021]`).
+- `gpunormal` is for RTX 8000/A100 GPU jobs. A100 nodes hold 3 GPUs each.
+- `h100` is the single H100 node `c022` with 4 H100 GPUs.
+- `build` (`b[001-002]`) has 1 A40 GPU per node.
 - CPU nodes: `c018`–`c021`.
-- GPU nodes: `c001`–`c017`, plus `c022` for H100.
+- GPU nodes: `c001`–`c017`, plus `c022` for H100, plus `b001`–`b002` (A40).
 - Build nodes: `b001`–`b002`.
 - Compute node hostnames resolve internally as `c018.cm.cluster`, `b001.cm.cluster`, etc.
-- GPFS home is mounted under `/gpfs/home`.
+- GPFS home is mounted under `/gpfs/home`. `$HOME` is `/home/$USER`, which resolves to the same place as `/gpfs/home/$USER`.
 - `/gpfs/project/` is the right place for shared team projects. Ask somit@yale.edu for a shared directory.
 - `/gpfs/scratch60/` is shared scratch and must be cleaned.
 - Compute node `/tmp` is local, ephemeral, and small; use it for temporary I/O-heavy work.

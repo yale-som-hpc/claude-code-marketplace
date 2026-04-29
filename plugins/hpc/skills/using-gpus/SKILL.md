@@ -135,8 +135,10 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 Current rough guide:
 
 - RTX 8000 / A40: 48 GB VRAM.
-- A100: 40 GB or 80 GB VRAM depending on node.
-- H100: 80 GB VRAM, scarcest partition.
+- A100: 40 GB or 80 GB VRAM depending on node. Each `gpunormal` A100 node holds 3 GPUs.
+- H100: 80 GB VRAM, scarcest partition. The single `h100` node holds 4 GPUs.
+
+`--gres=gpu:1` reserves one GPU on a shared node — other users' jobs may run on the same physical machine.
 
 Verify live state with `sinfo`; do not hardcode a GPU type unless you need it.
 
@@ -152,8 +154,13 @@ Then load the version your project expects, for example:
 
 ```bash
 module load cuda
-nvidia-smi
 nvcc --version
+```
+
+`nvidia-smi` only works on a GPU node. Login nodes have no GPU driver, so `nvidia-smi` will fail there even after `module load cuda`. Run it inside a GPU allocation:
+
+```bash
+srun --partition=gpunormal --gres=gpu:1 --time=00:05:00 --pty nvidia-smi
 ```
 
 If PyTorch/JAX was installed with bundled CUDA wheels, you may not need `nvcc`, but `nvidia-smi` should still work in a GPU allocation.

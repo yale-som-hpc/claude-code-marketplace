@@ -18,11 +18,17 @@ Rule: GPFS is good at large files and bad at metadata storms. Prefer fewer, larg
 ```text
 /gpfs/home/$USER/              personal home, not project storage
 /gpfs/project/myproject/       shared project data and code
-/gpfs/scratch60/$USER/         temporary shared scratch
+/gpfs/scratch60/$USER/         temporary shared scratch (create on first use)
 /tmp                           local ephemeral temp on a compute node
 ```
 
 Use `/gpfs/project/...` for shared research projects. Use `/tmp` for temporary high-I/O work inside one job. Copy final outputs back to GPFS.
+
+`/gpfs/scratch60/$USER` does not exist by default. Create it the first time you need it:
+
+```bash
+mkdir -p /gpfs/scratch60/$USER
+```
 
 ## Bad pattern: many tiny files
 
