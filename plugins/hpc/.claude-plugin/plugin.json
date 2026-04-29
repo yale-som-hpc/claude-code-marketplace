@@ -1,6 +1,6 @@
 {
   "name": "hpc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Yale SOM HPC skills: Slurm, GPUs, Python, R, Stata, GPFS, data acquisition.",
   "author": { "name": "Yale SOM HPC" }
 }

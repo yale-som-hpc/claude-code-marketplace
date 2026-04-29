@@ -134,9 +134,11 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 
 Current rough guide:
 
-- RTX 8000 / A40: 48 GB VRAM.
+- RTX 8000 / A40: 48 GB nominal; `nvidia-smi` reports ~46 GB usable on RTX 8000.
 - A100: 40 GB or 80 GB VRAM depending on node. Each `gpunormal` A100 node holds 3 GPUs.
 - H100: 80 GB VRAM, scarcest partition. The single `h100` node holds 4 GPUs.
+
+The driver on GPU nodes currently supports the CUDA 12.8 runtime, so PyTorch/JAX wheels with bundled CUDA generally work without `module load cuda`.
 
 `--gres=gpu:1` reserves one GPU on a shared node — other users' jobs may run on the same physical machine.
 
