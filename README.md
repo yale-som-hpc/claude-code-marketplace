@@ -93,7 +93,18 @@ A skill is a single `SKILL.md` with YAML frontmatter and a directive playbook bo
 
 ## Contributing
 
-Most skills are short — a fix or new section is usually a one-PR change.
+Most skills are short — a fix or new section is usually a one-PR change. If you're not ready to write a fix, file an issue.
+
+### Filing an issue
+
+Open an issue at <https://github.com/yale-som-hpc/claude-code-marketplace/issues>. Useful issues fall into a few buckets:
+
+- **Skill is wrong.** A code example that fails on the current cluster, a partition name that no longer exists, a `module load` that errors. Include the command you ran and the error you got. Cluster-truth bugs are the highest-priority fixes.
+- **Skill is missing.** A pattern you keep re-deriving (e.g. "how do I run a long-running Stan job", "how do I share a conda-installed binary with collaborators"). Describe the workflow and roughly what the rule should be — we'll figure out where it fits.
+- **Skill is misfiring.** Claude is loading a skill on your laptop where it shouldn't, or not loading it on the cluster where it should. Include the prompt that triggered it and which skill fired.
+- **Doc gap.** A README, install, or contribution-flow problem. Just describe what you tried and what was unclear.
+
+You don't need to propose a fix. A clear "this happened, I expected this, instead I got this" is enough.
 
 ### Workflow
 
