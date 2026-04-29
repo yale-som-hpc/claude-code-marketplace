@@ -68,6 +68,51 @@ df.to_parquet("/gpfs/project/myproject/data/raw/crsp_msf_2010_plus.parquet")
 
 Do not run the same WRDS extract inside every analysis job.
 
+## Postgres / WRDS connections from parallel workers
+
+For direct Postgres access (including WRDS, which is Postgres under the hood), keep credentials out of code with a `pg_service.conf` file in `$HOME` and reference connections by service name:
+
+```ini
+# ~/.pg_service.conf — chmod 600
+[wrds]
+host=wrds-pgdata.wharton.upenn.edu
+port=9737
+dbname=wrds
+user=yourwrdsid
+
+[mydb]
+host=db.example.com
+dbname=research
+user=yournetid
+```
+
+Combined with `~/.pgpass` (already `chmod 600`), code stays free of secrets:
+
+```python
+import psycopg
+
+with psycopg.connect("service=wrds") as conn, conn.cursor() as cur:
+    cur.execute("select permno, date, ret from crsp.msf where date >= %s", ("2010-01-01",))
+    rows = cur.fetchall()
+```
+
+When parallel workers share a database, **always use a connection pool**. Do not let each worker open its own short-lived connection — Postgres servers cap concurrent connections, WRDS especially, and naive parallelism will get you rate-limited or blocked:
+
+```python
+from psycopg_pool import ConnectionPool
+
+# One pool per process. With multiprocessing, create the pool inside the worker,
+# not in the parent — connections cannot survive a fork.
+pool = ConnectionPool("service=wrds", min_size=2, max_size=8)
+
+def fetch(permno: int):
+    with pool.connection() as conn, conn.cursor() as cur:
+        cur.execute("select date, ret from crsp.msf where permno = %s", (permno,))
+        return cur.fetchall()
+```
+
+Bound `max_size` deliberately. A pool of 8 across 4 worker processes means 32 concurrent connections — past most Postgres limits. Set the pool size to a small number per worker (2–4) and let the pool queue further requests.
+
 ## Request-hash cache
 
 Use this for paid APIs, web pages, embeddings, LLM calls, and slow endpoints.
@@ -181,6 +226,9 @@ for request in requests:
 ## Further reading
 
 - [WRDS support pages](https://wrds-www.wharton.upenn.edu/pages/support/) — `wrds` Python package, `.pgpass`, schemas.
+- [psycopg 3](https://www.psycopg.org/psycopg3/docs/) — connections, cursors, type adapters.
+- [psycopg_pool](https://www.psycopg.org/psycopg3/docs/advanced/pool.html) — `ConnectionPool` sizing, `min_size`/`max_size`, lifecycle.
+- [PostgreSQL service file](https://www.postgresql.org/docs/current/libpq-pgservice.html) — `pg_service.conf` indirection so code references `service=wrds` instead of credentials.
 - [httpx](https://www.python-httpx.org/) — modern sync/async HTTP client (preferred over `requests` for new code).
 - [tenacity](https://tenacity.readthedocs.io/en/latest/) — retry decorators, backoff, stop conditions.
 - [RFC 9309 (robots.txt)](https://www.rfc-editor.org/rfc/rfc9309.html) — the spec scrapers should respect.

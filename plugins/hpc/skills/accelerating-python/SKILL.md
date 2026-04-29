@@ -73,7 +73,7 @@ def scale(arr):
     return out
 ```
 
-Use `cache=True` so compiled code is reused across runs.
+Use `cache=True` so compiled code is reused across runs. `nogil=True` is redundant under `@njit` and adds noise — leave it off.
 
 ## Parallel Numba
 
@@ -101,7 +101,7 @@ def count_bad(counts, idx):
         counts[idx[i]] += 1
 ```
 
-Multiple workers can update the same `counts` element. Use per-worker accumulators and reduce, or use a serial loop if correctness matters more than speed.
+Multiple workers can update the same `counts` element. Use per-worker accumulators and reduce, or use a serial loop if correctness matters more than speed. For sparse scatter-add patterns where the parallel speedup is modest, `np.add.at(counts, idx, 1)` outside Numba is thread-safe and clear.
 
 ## Compilation tax
 

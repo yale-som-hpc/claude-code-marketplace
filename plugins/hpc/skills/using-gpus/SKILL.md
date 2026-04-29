@@ -185,6 +185,15 @@ import torch
 device = f"cuda:{worker_id % torch.cuda.device_count()}"
 ```
 
+For mixed-load workers where models or batches differ in size, pick the GPU with the most free memory at start:
+
+```python
+import torch
+
+free = [torch.cuda.mem_get_info(i)[0] for i in range(torch.cuda.device_count())]
+device = f"cuda:{free.index(max(free))}"
+```
+
 ## Handle GPU OOM by shrinking batches
 
 Do not blindly retry the same oversized batch.
@@ -205,6 +214,12 @@ def run_inference(model, batch):
         torch.cuda.empty_cache()
         mid = len(batch) // 2
         return run_inference(model, batch[:mid]) + run_inference(model, batch[mid:])
+```
+
+If OOM keeps recurring on healthy-looking batches, fragmentation is likely. Set the PyTorch CUDA allocator to use expandable segments before importing torch:
+
+```bash
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 ```
 
 ## Checklist
