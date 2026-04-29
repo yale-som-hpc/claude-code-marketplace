@@ -46,20 +46,7 @@ mkdir -p src scripts slurm
 
 ## `.gitignore`
 
-```gitignore
-.venv/
-__pycache__/
-*.pyc
-.Rproj.user/
-renv/library/
-logs/
-output/
-data/raw/
-data/derived/
-.env
-```
-
-Track code, lockfiles, and documentation. Do not track data, credentials, environments, logs, or generated output.
+Track code, lockfiles, and documentation. Do not track data, credentials, environments, logs, or generated output. Pull a starting point from [github/gitignore](https://github.com/github/gitignore) and add `data/`, `logs/`, `output/`, `.env`.
 
 ## README minimum
 
@@ -110,24 +97,7 @@ Keep recipes thin. The real logic should live in Python/R/Stata scripts, not in 
 
 ## First test job
 
-```bash
-#!/bin/bash
-#SBATCH --job-name=myproject-test
-#SBATCH --partition=default_queue
-#SBATCH --time=00:10:00
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=2G
-#SBATCH --output=/gpfs/project/myproject/logs/%x_%j.out
-
-set -euo pipefail
-
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-
-cd /gpfs/project/myproject/code
-uv run python -c "import sys, pathlib; print(sys.version); print(pathlib.Path.cwd())"
-```
+Always submit a tiny test job before any full run. Use the minimal sbatch template from [managing jobs](../managing-jobs/SKILL.md) with `--time=00:10:00 --mem=2G --cpus-per-task=1`, and have it print `sys.version` and `pathlib.Path.cwd()`. If that fails, fix it before submitting anything larger.
 
 ## Make raw data read-only after ingest
 

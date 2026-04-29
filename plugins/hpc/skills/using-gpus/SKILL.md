@@ -15,6 +15,8 @@ updated: 2026-04-28
 
 Rule: hold a GPU only while GPU code is actively running. Do CPU preprocessing, downloads, tokenization, and web/API calls elsewhere.
 
+GPUs are the scarcest resource on the cluster. An idle interactive GPU session — `srun --pty bash` left open while you go to lunch — is blocking another user's job right now. Cancel it. The H100 node has 4 GPUs total for the whole cluster; treat it accordingly.
+
 ## Do you need a GPU?
 
 Use a GPU for:

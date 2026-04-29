@@ -28,23 +28,13 @@ Use the cluster as a shared research instrument. Your job is not just to make co
 
 Current as of 2026-04-28. Verify live details with `sinfo -s` when generating production instructions.
 
-- Scheduler: Slurm.
-- Module system: Lmod. Modules are Spack-built, but users only run `module load`, never `spack` directly.
-- Main partitions: `default_queue`, `cpunormal`, `gpunormal`, `h100`, `build`.
-- `default_queue` has a 1-hour default and a 4-hour max time limit. It spans `b[001-002]` and `c[018-021]`, so a job can land on a build node with an A40 GPU or on a CPU-only node.
-- `cpunormal` is for CPU jobs (`c[018-021]`).
-- `gpunormal` is for RTX 8000/A100 GPU jobs. A100 nodes hold 3 GPUs each.
-- `h100` is the single H100 node `c022` with 4 H100 GPUs.
-- `build` (`b[001-002]`) has 1 A40 GPU per node.
-- CPU nodes: `c018`–`c021`.
-- GPU nodes: `c001`–`c017`, plus `c022` for H100, plus `b001`–`b002` (A40).
-- Build nodes: `b001`–`b002`.
-- Compute node hostnames resolve internally as `c018.cm.cluster`, `b001.cm.cluster`, etc.
-- GPFS home is mounted under `/gpfs/home`. `$HOME` is `/home/$USER`, which resolves to the same place as `/gpfs/home/$USER`.
-- `/gpfs/project/` is the right place for shared team projects. Ask somit@yale.edu for a shared directory.
-- `/gpfs/scratch60/` is shared scratch and must be cleaned.
-- Compute node `/tmp` is local, ephemeral, and small; use it for temporary I/O-heavy work.
-- `KillWait=30`: after Slurm sends final `SIGTERM`, jobs have only about 30 seconds before `SIGKILL`.
+- Scheduler: Slurm. Module system: Lmod (Spack-built; users run `module load`, never `spack`).
+- Main partitions: `default_queue` (4h max, mixed CPU/A40), `cpunormal`, `gpunormal` (RTX 8000/A100, 3 GPUs per A100 node), `h100` (one node, 4 H100s — scarcest resource on the cluster), `build`.
+- `/gpfs/project/` for shared team projects (request via somit@yale.edu). `/gpfs/scratch60/$USER/` for scratch (clean it). Compute node `/tmp` is local and ephemeral.
+- `$HOME` is `/home/$USER`, same as `/gpfs/home/$USER`.
+- `KillWait=30`: after final `SIGTERM`, jobs have ~30 seconds before `SIGKILL`. Too short to rely on for checkpointing.
+
+Run `sinfo -s` for live node-level detail.
 
 ## Which skill to use
 
@@ -60,16 +50,27 @@ Current as of 2026-04-28. Verify live details with `sinfo -s` when generating pr
 - Need external data, APIs, WRDS, or scraping? Use [acquiring data](../acquiring-data/SKILL.md).
 - Need to check whether a job was wasteful? Use [self-diagnosing resource use](../self-diagnosing-resource-use/SKILL.md).
 
-## Default safety rules
+## Two pillars
 
-1. Do not run heavy compute on login nodes.
-2. Do not request GPUs unless code actively uses them.
-3. Do not write thousands of tiny files when one Parquet/HDF5/zip file will do.
-4. Do not put credentials or API keys in scripts.
-5. Do not repeat paid API calls; cache by request hash.
-6. Do not rely on final `SIGTERM` for checkpointing; 30 seconds is too short.
-7. Do not use bare `$SLURM_CPUS_PER_TASK` in shell examples; use `${SLURM_CPUS_PER_TASK:-1}`.
-8. Always inspect resource usage after a serious job.
+Everything in these skills supports one of two goals:
+
+**Be polite.** This is a shared instrument. Other people are running jobs right now on the same nodes, GPUs, GPFS metadata servers, and queue.
+
+- Do not run heavy compute on login nodes — they belong to everyone.
+- Do not hold a GPU you are not actively using. Cancel idle interactive GPU sessions immediately.
+- Do not write thousands of tiny files. GPFS metadata is shared; storms slow down every user's `ls` and job startup.
+- Do not aggressive-scrape from the cluster. All jobs share one outbound IP; one user gets everyone blocked.
+- Throttle job arrays (e.g. `%50`). Leave room at the table.
+- Clean up scratch when work is done.
+
+**Be skillful.** Get correct results from the smallest resource request.
+
+- Request CPU, memory, GPU, and time explicitly; right-size the next job from `seff`/`sacct` output.
+- Use `${SLURM_CPUS_PER_TASK:-1}` for thread environment variables — never bare `$SLURM_CPUS_PER_TASK`.
+- Do not request GPUs unless the code actively uses CUDA.
+- Cache expensive downloads and API calls by request hash. Keep credentials out of scripts.
+- Make outputs resumable (skip-if-exists, atomic temp+rename) — `KillWait=30` is too short for clean shutdown.
+- Inspect resource usage after every serious job.
 
 ## Minimal safe Slurm shape
 

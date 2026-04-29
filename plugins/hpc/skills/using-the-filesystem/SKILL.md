@@ -13,6 +13,8 @@ updated: 2026-04-28
 
 Rule: GPFS is good at large files and bad at metadata storms. Prefer fewer, larger files.
 
+GPFS metadata is shared. A job that writes 100k tiny files slows down every other user's `ls`, `find`, and job startup — not just your own. This is the most common way to be unintentionally rude on the cluster.
+
 ## Where things go
 
 ```text

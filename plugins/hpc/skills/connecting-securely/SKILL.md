@@ -110,18 +110,9 @@ Open `http://localhost:9999`.
 
 ## VS Code / Cursor
 
-Connect to `hpc` for editing and light work. Connect to a compute node only after you have an active Slurm allocation on that node.
+Connect to `hpc` for editing. Connect to a compute node only after you have an active Slurm allocation on that node — never run heavy editor extensions or notebook kernels against the login node, which is shared by everyone.
 
-If Remote SSH is flaky through a jump host, add multiplexing locally:
-
-```sshconfig
-Host *
-    ControlMaster auto
-    ControlPath /tmp/ssh-%r@%h:%p
-    ControlPersist 10m
-```
-
-You must be on the Yale network path to reach the cluster: Yale VPN/AnyConnect, campus network, or an approved bastion/jump host. If you cannot reach `hpc`, fix network access before debugging SSH keys. For long-lived tunnels, `autossh` can restart dropped tunnels, but plain `ssh -NL ...` is easier to debug first.
+You must be on a Yale network path to reach the cluster (Yale VPN/AnyConnect or campus network). Fix network access before debugging SSH keys.
 
 ## Checklist
 

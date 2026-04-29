@@ -138,7 +138,7 @@ Use Apptainer when:
 
 ## Avoid conda by default
 
-Conda can work, but it is usually a poor default on shared GPFS: environments contain many small files, solves can be slow, and users often create one-off environments that are hard to reproduce. Prefer:
+Conda can work, but it is a poor default on shared GPFS. Each environment adds tens of thousands of small files, which inflates GPFS metadata load for every user — not just you. Solves are also slow, and one-off environments are hard to reproduce. Prefer:
 
 - `uv` for Python projects
 - modules for cluster-provided system software

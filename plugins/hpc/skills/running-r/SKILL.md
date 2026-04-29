@@ -126,15 +126,6 @@ write_parquet(results, tmp)
 file.rename(tmp, output)
 ```
 
-## Style defaults
-
-- Use `snake_case` for variables and functions.
-- Use `<-` for assignment.
-- Put `library()` calls at the top.
-- Use `here::here()` or explicit project paths; do not hardcode laptop paths.
-- Use `set.seed()` for stochastic work.
-- Prefer smoke tests on small real data before full cluster runs.
-
 ## Avoid
 
 ```bash
