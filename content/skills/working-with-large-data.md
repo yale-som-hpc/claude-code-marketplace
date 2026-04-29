@@ -31,6 +31,37 @@ Avoid:
 - repeated CSV parsing
 - Excel as an intermediate format
 
+## Quick command-line inspection
+
+Use DuckDB before writing a script:
+
+```bash
+duckdb -c "DESCRIBE SELECT * FROM 'data.csv'"
+duckdb -c "SELECT * FROM 'data.csv' LIMIT 10"
+duckdb -c "SELECT category, COUNT(*) FROM 'data.csv' GROUP BY category ORDER BY 2 DESC"
+```
+
+Convert reusable extracts to Parquet:
+
+```bash
+duckdb -c "COPY (SELECT * FROM 'data.csv') TO 'data.parquet' (FORMAT PARQUET)"
+```
+
+If `qsv` is installed, it is useful for fast CSV triage:
+
+```bash
+qsv stats data.csv
+qsv frequency data.csv category
+```
+
+For Excel files, inspect first, then convert or query:
+
+```bash
+xlsx2csv workbook.xlsx | head
+# or, when DuckDB has Excel support:
+duckdb -c "SELECT * FROM read_xlsx('workbook.xlsx', sheet='Sheet1') LIMIT 10"
+```
+
 ## DuckDB example
 
 ```python
@@ -39,10 +70,10 @@ import duckdb
 con = duckdb.connect()
 con.execute("""
 COPY (
-    SELECT permno, date, ret
-    FROM read_parquet('/gpfs/project/myproject/data/raw/crsp/*.parquet')
+    SELECT id, date, value
+    FROM read_parquet('/gpfs/project/myproject/data/raw/events/*.parquet')
     WHERE date >= DATE '2010-01-01'
-) TO '/gpfs/project/myproject/data/derived/crsp_2010_plus.parquet'
+) TO '/gpfs/project/myproject/data/derived/events_2010_plus.parquet'
 (FORMAT PARQUET)
 """)
 ```
@@ -62,6 +93,21 @@ result = (
 
 result.sink_parquet("/gpfs/project/myproject/output/sales_by_year.parquet")
 ```
+
+## SQLite for small caches
+
+Use SQLite for local caches and lookup tables. Enable WAL when multiple readers may use the cache.
+
+```python
+import sqlite3
+
+conn = sqlite3.connect("/gpfs/project/myproject/cache/lookup.db")
+conn.execute("PRAGMA journal_mode=WAL")
+conn.execute("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT)")
+conn.commit()
+```
+
+Use one connection per thread/process. SQLite serializes writes; keep one writer path when possible.
 
 ## R Arrow example
 
@@ -119,6 +165,7 @@ Large-data tools do not make invalid joins valid. For domain datasets, use the o
 
 - [ ] Raw data is stored once in a columnar format when possible.
 - [ ] Filters and column selection are pushed into the scan/query.
+- [ ] Files are inspected with DuckDB/qsv before writing large scripts.
 - [ ] Code is tested on a sample before full data.
 - [ ] Outputs are Parquet/HDF5, not thousands of tiny CSVs.
 - [ ] Large merges use documented identifiers or official link tables.

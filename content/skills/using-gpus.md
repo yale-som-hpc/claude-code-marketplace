@@ -5,6 +5,8 @@ description: Request GPUs only when code actively uses them, and diagnose idle a
 related:
   - managing-jobs
   - running-python
+  - parallel-python
+  - accelerating-python
   - self-diagnosing-resource-use
   - using-the-filesystem
   - acquiring-data
@@ -157,6 +159,46 @@ nvcc --version
 ```
 
 If PyTorch/JAX was installed with bundled CUDA wheels, you may not need `nvcc`, but `nvidia-smi` should still work in a GPU allocation.
+
+## Multiprocessing with CUDA
+
+Use `spawn`, not `fork`, when Python workers touch CUDA. Initialize models inside the worker, not in the parent process.
+
+```python
+import multiprocessing as mp
+
+ctx = mp.get_context("spawn")
+```
+
+If one process manages one GPU, assign devices deterministically:
+
+```python
+import torch
+
+device = f"cuda:{worker_id % torch.cuda.device_count()}"
+```
+
+## Handle GPU OOM by shrinking batches
+
+Do not blindly retry the same oversized batch.
+
+```python
+import gc
+import torch
+
+def run_inference(model, batch):
+    try:
+        with torch.no_grad():
+            return model(batch)
+    except RuntimeError as err:
+        if "out of memory" not in str(err).lower() or len(batch) <= 1:
+            raise
+        del err
+        gc.collect()
+        torch.cuda.empty_cache()
+        mid = len(batch) // 2
+        return run_inference(model, batch[:mid]) + run_inference(model, batch[mid:])
+```
 
 ## Checklist
 

@@ -4,6 +4,7 @@ slug: parallel-python
 description: Choose threads, processes, queues, job arrays, and shutdown patterns for Python work on the cluster.
 related:
   - running-python
+  - accelerating-python
   - managing-jobs
   - working-with-large-data
   - acquiring-data
@@ -13,7 +14,7 @@ updated: 2026-04-28
 
 # Parallel Python
 
-Rule: match the parallelism model to the bottleneck. Do not add processes, threads, and Slurm arrays on top of each other without a reason.
+Rule: match the parallelism model to the bottleneck. Do not add processes, threads, and Slurm arrays on top of each other without a reason. If one process is simply too slow, first check [accelerating Python](./accelerating-python.md).
 
 ## Choose the right tool
 

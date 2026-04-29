@@ -87,6 +87,29 @@ Track code, lockfiles, and documentation. Do not track data, credentials, enviro
 - `data/derived/`: rebuildable from raw data and code.
 ```
 
+## Add a thin Justfile
+
+Use `just` to document common commands without hiding what they do.
+
+```just
+set dotenv-load
+set shell := ["bash", "-euo", "pipefail", "-c"]
+
+default:
+    @just --list
+
+setup:
+    uv sync
+
+run *ARGS:
+    uv run python src/main.py {{ARGS}}
+
+test-job:
+    sbatch slurm/test.sh
+```
+
+Keep recipes thin. The real logic should live in Python/R/Stata scripts, not in the Justfile.
+
 ## First test job
 
 ```bash
@@ -125,4 +148,5 @@ Do not lock `data/raw/` before collaborators have finished placing the initial f
 - [ ] Raw data is read-only.
 - [ ] Environments are reproducible from lockfiles.
 - [ ] Logs go to `logs/`.
+- [ ] Justfile or README documents the common commands.
 - [ ] First Slurm test job passes before any full run.

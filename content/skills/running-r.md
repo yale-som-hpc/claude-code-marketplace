@@ -78,6 +78,30 @@ cd /gpfs/project/myproject/code
 Rscript src/main.R
 ```
 
+## CLI script pattern
+
+Use an explicit script entry point so batch jobs can pass inputs and outputs.
+
+```r
+#!/usr/bin/env Rscript
+suppressPackageStartupMessages({
+  library(optparse)
+  library(arrow)
+})
+
+option_list <- list(
+  make_option(c("-i", "--input"), type = "character"),
+  make_option(c("-o", "--output"), type = "character")
+)
+opt <- parse_args(OptionParser(option_list = option_list))
+
+if (is.null(opt$input) || is.null(opt$output)) {
+  stop("--input and --output are required", call. = FALSE)
+}
+```
+
+Prefer clear errors and command-line arguments over editing paths inside scripts.
+
 ## Read Slurm settings in R
 
 ```r
@@ -104,6 +128,15 @@ write_parquet(results, tmp)
 file.rename(tmp, output)
 ```
 
+## Style defaults
+
+- Use `snake_case` for variables and functions.
+- Use `<-` for assignment.
+- Put `library()` calls at the top.
+- Use `here::here()` or explicit project paths; do not hardcode laptop paths.
+- Use `set.seed()` for stochastic work.
+- Prefer smoke tests on small real data before full cluster runs.
+
 ## Avoid
 
 ```bash
@@ -117,6 +150,7 @@ Install/restore once, then run many jobs.
 - [ ] Job script loads R module explicitly.
 - [ ] `renv.lock` is committed.
 - [ ] `renv::restore()` is not inside job arrays.
+- [ ] Batch scripts accept input/output arguments instead of hardcoded paths.
 - [ ] BLAS/OpenMP thread variables are set.
 - [ ] `data.table` threads match allocated CPUs.
 - [ ] Outputs are resumable and atomically written.

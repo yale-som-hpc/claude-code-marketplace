@@ -6,6 +6,7 @@ related:
   - installing-software
   - managing-jobs
   - parallel-python
+  - accelerating-python
   - working-with-large-data
   - using-gpus
   - acquiring-data
