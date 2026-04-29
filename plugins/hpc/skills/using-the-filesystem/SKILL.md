@@ -157,3 +157,10 @@ If `ls` takes seconds or file counts are in the tens of thousands, consolidate.
 - [ ] Writes are atomic: temp file then rename.
 - [ ] Scratch is cleaned regularly.
 - [ ] Transfers use `rsync -avP`, not fragile one-shot copies.
+
+## Further reading
+
+- [rsync man page](https://www.man7.org/linux/man-pages/man1/rsync.1.html) — `-avP`, `--partial`, `--checksum`, `--exclude`.
+- [croc](https://github.com/schollz/croc) — encrypted peer-to-peer transfers with collaborators.
+- [rclone documentation](https://rclone.org/docs/) — cloud and S3-compatible transfers.
+- [Apache Arrow / Parquet](https://arrow.apache.org/docs/) — columnar format reference (also see working-with-large-data).

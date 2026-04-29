@@ -128,3 +128,10 @@ nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv 2>/
 - [ ] Checked scratch usage and old files.
 - [ ] Confirmed output file count is reasonable.
 - [ ] Made the next job shorter or more resumable where possible.
+
+## Further reading
+
+- [Slurm sacct](https://slurm.schedmd.com/sacct.html) — format strings, fields like `MaxRSS`, `TotalCPU`, `Elapsed`.
+- [Slurm squeue](https://slurm.schedmd.com/squeue.html) — format strings and reason codes for pending jobs.
+- [`nvidia-smi` reference](https://docs.nvidia.com/deploy/nvidia-smi/) — `--query-gpu`, logging utilization, MIG.
+- [py-spy](https://github.com/benfred/py-spy) — `py-spy dump --pid PID` for stuck Python processes.

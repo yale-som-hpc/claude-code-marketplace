@@ -130,3 +130,10 @@ You must be on the Yale network path to reach the cluster: Yale VPN/AnyConnect, 
 - [ ] Compute-node SSH is attempted only for the node allocated to your job.
 - [ ] GitHub auth works by agent forwarding or `gh`, not copied keys.
 - [ ] Tunnels go to compute nodes, not login-node compute sessions.
+
+## Further reading
+
+- [`ssh_config(5)`](https://man.openbsd.org/ssh_config) — every `~/.ssh/config` keyword (`ProxyJump`, `ControlMaster`, `ForwardAgent`, etc.).
+- [`ssh-agent(1)`](https://man.openbsd.org/ssh-agent) — agent lifecycle, `SSH_AUTH_SOCK`, agent forwarding.
+- [VS Code Remote-SSH](https://code.visualstudio.com/docs/remote/ssh) — connecting an editor to the cluster.
+- [GitHub CLI auth](https://cli.github.com/manual/gh_auth_login) — `gh auth login` flow on a remote host.

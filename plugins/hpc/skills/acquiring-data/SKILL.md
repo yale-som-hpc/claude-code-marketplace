@@ -177,3 +177,11 @@ for request in requests:
 - [ ] Scrapers sleep and respect robots/rate limits.
 - [ ] Paid API jobs estimate cost before full run.
 - [ ] Shared project cache prevents multiple RAs from paying for the same call.
+
+## Further reading
+
+- [WRDS support pages](https://wrds-www.wharton.upenn.edu/pages/support/) — `wrds` Python package, `.pgpass`, schemas.
+- [httpx](https://www.python-httpx.org/) — modern sync/async HTTP client (preferred over `requests` for new code).
+- [tenacity](https://tenacity.readthedocs.io/en/latest/) — retry decorators, backoff, stop conditions.
+- [RFC 9309 (robots.txt)](https://www.rfc-editor.org/rfc/rfc9309.html) — the spec scrapers should respect.
+- [`hashlib`](https://docs.python.org/3/library/hashlib.html) — request-hash cache keys.

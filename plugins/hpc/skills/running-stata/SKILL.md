@@ -90,3 +90,9 @@ Stata MP licenses are shared. Do not leave interactive Stata sessions idle. Do n
 - [ ] `set processors` matches `SLURM_CPUS_PER_TASK`.
 - [ ] Each array task writes separate output.
 - [ ] Idle Stata sessions are closed.
+
+## Further reading
+
+- [Stata batch mode (`gswb` PDF)](https://www.stata.com/manuals/gswb.pdf) — `-b do`, log behavior, exit codes.
+- [Stata `set processors`](https://www.stata.com/help.cgi?set_processors) — MP core control.
+- [Stata `frames` reference](https://www.stata.com/manuals/dframes.pdf) — multiple in-memory datasets.

@@ -148,3 +148,10 @@ Do not lock `data/raw/` before collaborators have finished placing the initial f
 - [ ] Logs go to `logs/`.
 - [ ] Justfile or README documents the common commands.
 - [ ] First Slurm test job passes before any full run.
+
+## Further reading
+
+- [uv documentation](https://docs.astral.sh/uv/) — `uv init --app`, `uv sync`, `uv add`.
+- [renv introduction](https://rstudio.github.io/renv/articles/renv.html) — `renv::init`, `renv::snapshot`, `renv::restore`.
+- [Just manual](https://just.systems/man/en/) — recipes, dotenv loading, parameters.
+- [github/gitignore](https://github.com/github/gitignore) — canonical `.gitignore` templates per language and tool.

@@ -168,3 +168,11 @@ Large-data tools do not make invalid joins valid. For domain datasets, use the o
 - [ ] Outputs are Parquet/HDF5, not thousands of tiny CSVs.
 - [ ] Large merges use documented identifiers or official link tables.
 - [ ] Memory use is checked after the test job.
+
+## Further reading
+
+- [DuckDB documentation](https://duckdb.org/docs/) — SQL over Parquet/CSV/Arrow, `COPY ... TO`, sampling.
+- [Polars user guide](https://docs.pola.rs/) — lazy evaluation, `scan_parquet`, `sink_parquet`, expressions.
+- [Apache Arrow](https://arrow.apache.org/docs/) — Parquet, Arrow datasets, `pyarrow`, columnar concepts.
+- [h5py documentation](https://docs.h5py.org/en/stable/) — HDF5 from Python.
+- [qsv](https://github.com/jqnatividad/qsv) and [xsv](https://github.com/BurntSushi/xsv) — fast CSV inspection and triage.

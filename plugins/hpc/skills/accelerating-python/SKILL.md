@@ -121,3 +121,12 @@ scale(arr)  # measure this call
 - [ ] Parallel Numba avoids shared write races.
 - [ ] Multiprocessing is used only when a single-process optimization is not enough.
 - [ ] GPU use is justified by actual CUDA/GPU-backed code.
+
+## Further reading
+
+- [DuckDB documentation](https://duckdb.org/docs/) — SQL over files, Parquet pushdown, Python API.
+- [Polars user guide](https://docs.pola.rs/) — lazy frames, expressions, `scan_*` / `sink_*`.
+- [Numba documentation](https://numba.readthedocs.io/en/stable/) — `@njit`, `prange`, parallel reductions.
+- [`cProfile` / `pstats`](https://docs.python.org/3/library/profile.html) — built-in profilers.
+- [py-spy](https://github.com/benfred/py-spy) — sampling profiler for running processes (`py-spy dump --pid PID`).
+- [PyTorch install matrix](https://pytorch.org/get-started/locally/) — when GPU acceleration is the right tool.

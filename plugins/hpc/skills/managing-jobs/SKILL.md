@@ -111,3 +111,10 @@ sacct -j JOBID --format=JobID,Elapsed,MaxRSS,AllocCPUS,TotalCPU,State
 - [ ] Arrays use a concurrency throttle like `%50`.
 - [ ] Output paths include job IDs or task IDs.
 - [ ] Resource usage is checked after completion.
+
+## Further reading
+
+- [Slurm sbatch reference](https://slurm.schedmd.com/sbatch.html) — every `#SBATCH` directive, output filename patterns, signal handling.
+- [Slurm job arrays](https://slurm.schedmd.com/job_array.html) — `--array` syntax, throttling (`%N`), `SLURM_ARRAY_*` env vars.
+- [Slurm squeue](https://slurm.schedmd.com/squeue.html) and [sacct](https://slurm.schedmd.com/sacct.html) — format strings, state codes.
+- [Slurm quickstart](https://slurm.schedmd.com/quickstart.html) — sbatch/srun/sacct big picture.

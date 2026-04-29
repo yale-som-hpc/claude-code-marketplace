@@ -307,3 +307,12 @@ Choose one main layer of parallelism.
 - [ ] Multiprocessing start method is explicit when CUDA/threads/open handles are involved.
 - [ ] Process logs go through one listener or separate per-worker files.
 - [ ] Nested parallelism is intentional and documented.
+
+## Further reading
+
+- [`multiprocessing`](https://docs.python.org/3/library/multiprocessing.html) — `Pool`, `Process`, queues, locks.
+- [Start methods](https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods) — `spawn`, `fork`, `forkserver` semantics.
+- [`concurrent.futures`](https://docs.python.org/3/library/concurrent.futures.html) — `ProcessPoolExecutor`, `as_completed`, `map`.
+- [joblib](https://joblib.readthedocs.io/en/stable/) — `Parallel`/`delayed`, memoization.
+- [Dask](https://docs.dask.org/en/stable/) and [Ray](https://docs.ray.io/en/latest/) — when one node isn't enough.
+- [Slurm job arrays](https://slurm.schedmd.com/job_array.html) — for embarrassingly-parallel tasks at the scheduler layer.

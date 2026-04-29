@@ -99,3 +99,9 @@ hostname
 - [ ] Outputs are resumable or safely overwriteable.
 - [ ] Expensive downloads/API calls are cached.
 - [ ] Resource use is checked after the job.
+
+## Further reading
+
+- [Slurm quickstart](https://slurm.schedmd.com/quickstart.html) — overall mental model for sbatch/srun/sinfo/sacct.
+- [Slurm sbatch reference](https://slurm.schedmd.com/sbatch.html) — every `#SBATCH` directive and env var (`SLURM_*`).
+- [Lmod user guide](https://lmod.readthedocs.io/en/latest/) — `module spider`, `module load`, hierarchy.

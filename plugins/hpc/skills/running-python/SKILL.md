@@ -146,3 +146,10 @@ print(torch.cuda.get_device_name(0))
 - [ ] Multiprocessing workers do not exceed allocated CPUs.
 - [ ] Outputs are skip-if-exists and atomically written.
 - [ ] Logs include job ID and key progress messages.
+
+## Further reading
+
+- [uv documentation](https://docs.astral.sh/uv/) — projects, environments, lockfiles, `uv run`.
+- [Slurm sbatch reference](https://slurm.schedmd.com/sbatch.html) — directives and `SLURM_*` env vars Python reads.
+- [`logging` module](https://docs.python.org/3/library/logging.html) — handlers, formatters, levels.
+- [`argparse` module](https://docs.python.org/3/library/argparse.html) — CLI args for resumable task scripts.

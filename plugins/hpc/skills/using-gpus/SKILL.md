@@ -215,3 +215,10 @@ def run_inference(model, batch):
 - [ ] `nvidia-smi` confirms the process uses GPU memory.
 - [ ] GPU utilization is not near zero for long periods.
 - [ ] Job is cancelled when interactive GPU work is done.
+
+## Further reading
+
+- [Slurm GRES](https://slurm.schedmd.com/gres.html) — `--gres`, GPU type selection, sharded GPUs.
+- [PyTorch install matrix](https://pytorch.org/get-started/locally/) — pick CUDA-bundled wheels matching the cluster driver.
+- [JAX installation](https://jax.readthedocs.io/en/latest/installation.html) — CUDA wheels and version compatibility.
+- [`nvidia-smi` man page](https://docs.nvidia.com/deploy/nvidia-smi/) — query options, logging utilization, MIG.

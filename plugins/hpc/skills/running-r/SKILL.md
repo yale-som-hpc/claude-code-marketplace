@@ -152,3 +152,10 @@ Install/restore once, then run many jobs.
 - [ ] BLAS/OpenMP thread variables are set.
 - [ ] `data.table` threads match allocated CPUs.
 - [ ] Outputs are resumable and atomically written.
+
+## Further reading
+
+- [renv documentation](https://rstudio.github.io/renv/) — `init`, `snapshot`, `restore`, project libraries.
+- [data.table reference](https://rdatatable.gitlab.io/data.table/) — `setDTthreads`, `fread`, `:=`, joins.
+- [Apache Arrow for R](https://arrow.apache.org/docs/r/) — `open_dataset`, Parquet I/O, dplyr verbs.
+- [Lmod user guide](https://lmod.readthedocs.io/en/latest/) — `module load r`, `module purge`.

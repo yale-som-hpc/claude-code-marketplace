@@ -163,3 +163,10 @@ Prefer project lockfiles and local binary installs.
 - [ ] Caches use `XDG_CACHE_HOME` when heavy.
 - [ ] Static/musl binaries are preferred for standalone tools.
 - [ ] No `sudo`, no credentials in install scripts, no per-job environments.
+
+## Further reading
+
+- [uv documentation](https://docs.astral.sh/uv/) — `uv init`, `uv add`, `uv run`, lockfile and Python interpreter management.
+- [Lmod user guide](https://lmod.readthedocs.io/en/latest/) — `module spider`, dependency hierarchy, `module purge`.
+- [Apptainer user guide](https://apptainer.org/docs/user/latest/) — building, pulling, running containers without root.
+- [XDG Base Directory spec](https://specifications.freedesktop.org/basedir-spec/latest/) — `XDG_CACHE_HOME`/`XDG_CONFIG_HOME`/`XDG_DATA_HOME`.
