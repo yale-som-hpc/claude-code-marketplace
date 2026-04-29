@@ -50,6 +50,8 @@ srun .venv/bin/python src/analysis.py
 
 Use `srun .venv/bin/python ...` (not `uv run python ...` and not bare `python` under bash) for any job that may run long enough to hit `--signal=USR1@N`. See [running Python](../running-python/SKILL.md) and [parallel Python](../parallel-python/SKILL.md) for the empirical reasons. For R, the equivalent is `srun Rscript src/main.R`.
 
+A note on `SLURM_*` environment variables: these are only set inside `sbatch`/`srun` jobs. The `${SLURM_CPUS_PER_TASK:-1}` form means "use Slurm's value when set, otherwise fall back to 1," which lets you run the same script on your laptop (where it falls back to 1 thread) and on the cluster (where Slurm fills it in). Same idea for `SLURM_JOB_ID`, `SLURM_ARRAY_TASK_ID`, etc.
+
 ## Bad-interpreter / `$'\r'` errors from sbatch
 
 If `sbatch job.sh` fails with `bad interpreter`, `: not found`, or `$'\r'` in the error, you have CRLF line endings (typical when editing on Windows or when a download mangled the file). Fix in place:

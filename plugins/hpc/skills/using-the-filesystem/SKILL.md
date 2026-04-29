@@ -100,12 +100,19 @@ For high-I/O work, stage inputs onto the compute node's local `/tmp`, work there
 # Compute node /tmp is local, ephemeral, and small. Use it for one job at a time.
 workdir=$(mktemp -d "${TMPDIR:-/tmp}/job_${SLURM_JOB_ID:-local}.XXXXXX")
 export TMPDIR="$workdir"                  # so libraries that honor TMPDIR write here too
-trap 'rm -rf "$workdir"' EXIT             # clean even on crash, signal, or time-limit kill
+trap 'rm -rf "$workdir"' EXIT             # clean on normal exit and on SIGTERM (when paired with `wait` below)
 
 cp /gpfs/project/myproject/data/input.parquet "$workdir"/
+
+# Run the work in the background and `wait` so bash can run the trap when
+# Slurm sends SIGTERM at the time limit. If you call srun directly in the
+# foreground, bash blocks until SIGKILL and the trap may not fire.
 srun .venv/bin/python src/process.py \
     --input "$workdir/input.parquet" \
-    --output "$workdir/output.parquet"
+    --output "$workdir/output.parquet" &
+job_pid=$!
+wait "$job_pid"
+
 cp "$workdir/output.parquet" /gpfs/project/myproject/output/
 ```
 
@@ -113,7 +120,7 @@ Notes:
 
 - `mktemp -d "${TMPDIR:-/tmp}/..."` (with a path template) works the same on Linux and macOS. Avoid `mktemp -t`; the `-t` semantics differ across systems.
 - Setting `TMPDIR` makes Python's `tempfile`, R's `tempdir()`, Polars/Arrow scratch, and most well-behaved tools write to your per-job directory.
-- The `trap ... EXIT` runs on normal exits and on SIGTERM (the first signal Slurm sends at the time limit), so the workdir is cleaned in the common cases. SIGKILL bypasses traps; if a job is force-killed, the directory survives on the node's local disk and ages out on its own.
+- **Why `& wait` and not just `srun ...` directly?** I tested this on the cluster (jobs 571650 and 571651). With `srun ... ` (or any non-builtin) running in the foreground, bash queues the SIGTERM but cannot run the trap until the foreground command returns — by which point Slurm has already sent SIGKILL and the trap never fires. With `cmd & wait $!`, bash is parked in the `wait` builtin, which is interruptible, so the trap fires inside the `KillWait` window. SIGKILL still bypasses traps entirely; if a force-kill happens, `/tmp` on the compute node ages out on its own.
 
 ## Moving files
 

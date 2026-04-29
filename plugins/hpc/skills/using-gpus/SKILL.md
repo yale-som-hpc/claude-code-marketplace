@@ -63,6 +63,8 @@ srun .venv/bin/python train.py
 
 Only request multiple GPUs if the code explicitly uses multiple GPUs.
 
+Want to develop locally too? `train.py` itself should not assume Slurm — write it so `python train.py` (no `srun`, no `nvidia-smi`) works on your laptop's CPU. Use `torch.cuda.is_available()` to branch on device, and read `${SLURM_CPUS_PER_TASK:-N}` style fallbacks for thread counts. The Slurm script is the cluster-only wrapper; the Python should be portable.
+
 ## Split preprocessing from GPU work
 
 Bad:

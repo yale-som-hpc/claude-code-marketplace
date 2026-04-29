@@ -27,10 +27,18 @@ Rule: pick one main layer of parallelism, match it to the bottleneck, and size w
 
 ## Respect the Slurm allocation
 
+`SLURM_CPUS_PER_TASK` is set inside Slurm jobs and unset on your laptop. Use a small helper so the same script works in both places:
+
 ```python
 import os
 
-n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+def available_workers() -> int:
+    """Match the Slurm allocation when running under sbatch/srun, fall back
+    to the local machine's CPU count for laptop / login-node testing."""
+    slurm = os.environ.get("SLURM_CPUS_PER_TASK")
+    if slurm:
+        return int(slurm)
+    return os.cpu_count() or 1
 ```
 
 If Slurm gives you 4 CPUs, do not start 32 workers. If each worker calls BLAS/NumPy, also set thread environment variables in the Slurm script.
@@ -93,7 +101,7 @@ import os
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("driver")
 
-n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+n_workers = available_workers()  # see "Respect the Slurm allocation" above
 
 def work(task_id: int) -> tuple[int, int]:
     return task_id, task_id ** 2
@@ -136,7 +144,7 @@ When tasks vary by 10× or more in runtime, `imap_unordered(..., chunksize=1)` i
 from multiprocessing import Pool
 import os
 
-n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+n_workers = available_workers()  # see "Respect the Slurm allocation" above
 
 with Pool(processes=n_workers) as pool:
     for done_path in pool.imap_unordered(process_file, input_paths, chunksize=1):
@@ -149,32 +157,32 @@ For uniform work, start with `chunksize=len(items) // n_workers`. For uneven wor
 
 Use this only when you genuinely need a staged pipeline: one stage reads, workers transform, one writer serializes. Bounded queues bound memory; a single writer avoids interleaved output and the metadata cost of every worker opening its own files.
 
-This is a recipe — copy the whole shape. The `task_done()` calls, the one-sentinel-per-worker count, the bounded `output_queue`, and starting the writer *before* the workers are all load-bearing. Missing any of them is a common cause of jobs hanging until `SIGKILL`.
+This is a recipe — copy the whole shape. The `task_done()` calls, the one-quit-signal-per-worker count, the bounded `output_queue`, and starting the writer *before* the workers are all load-bearing. Missing any of them is a common cause of jobs hanging until `SIGKILL`.
 
 ```python
 from multiprocessing import JoinableQueue, Process, Queue
 import os
 
-SENTINEL = None
+QUIT_SIGNAL = None
 
 def worker(input_queue: JoinableQueue, output_queue: Queue):
     while True:
         item = input_queue.get()
         try:
-            if item is SENTINEL:
+            if item is QUIT_SIGNAL:
                 return
             output_queue.put(transform(item))
         finally:
-            input_queue.task_done()  # required even for the sentinel
+            input_queue.task_done()  # required even for the quit signal
 
 def writer(output_queue: Queue):
     while True:
         item = output_queue.get()
-        if item is SENTINEL:
+        if item is QUIT_SIGNAL:
             return
         write_results(item)  # one process owns all output
 
-n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+n_workers = available_workers()  # see "Respect the Slurm allocation" above
 input_queue = JoinableQueue(maxsize=n_workers * 3)   # bounded → memory-bounded
 output_queue = Queue(maxsize=n_workers * 3)          # bounded → workers cannot outrun the writer
 
@@ -190,8 +198,8 @@ for p in workers:
 
 for item in tasks:
     input_queue.put(item)
-for _ in workers:                                     # one sentinel per worker
-    input_queue.put(SENTINEL)
+for _ in workers:                                     # one quit signal per worker
+    input_queue.put(QUIT_SIGNAL)
 
 input_queue.join()                                    # wait for all task_done() calls
 
@@ -200,7 +208,7 @@ for p in workers:
     if p.is_alive():
         p.terminate()
 
-output_queue.put(SENTINEL)                            # only after workers have stopped producing
+output_queue.put(QUIT_SIGNAL)                            # only after workers have stopped producing
 writer_proc.join(timeout=30)
 if writer_proc.is_alive():
     writer_proc.terminate()
@@ -236,24 +244,36 @@ Multiple processes writing to the same stream without funneling produce garbled 
 
 ## Debug stuck jobs
 
-Long Slurm jobs that hang are expensive — they burn allocation until the time limit. Make stuck jobs diagnosable up front:
+A Python job that hangs on the cluster is genuinely expensive: Slurm keeps the allocation reserved until the time limit, blocking other people's jobs. Worse, when it eventually times out, you may have no idea where it was stuck. Two small additions to your script make stuck jobs diagnosable instead of silent.
+
+`faulthandler` is in the Python standard library — no extra install. It does two useful things on the cluster:
+
+1. **`faulthandler.enable()`** — when Python crashes hard (segfault from a C extension, division-by-zero in NumPy with certain flags, etc.), Python normally just dies with no traceback. With `faulthandler.enable()`, it prints the Python traceback to stderr first, so you actually see where the crash happened.
+
+2. **`faulthandler.register(signal.SIGUSR2, ...)`** — turns a signal into a "dump every thread's stack to stderr right now" command. Useful when your job is *running* but stuck (deadlock, infinite loop, waiting on a network call), and you want to see what every worker thread is doing without restarting the program.
+
+Add this at the top of any long-running script:
 
 ```python
 import faulthandler
 import signal
 import sys
 
-faulthandler.enable()                                       # SIGSEGV/SIGABRT/SIGFPE dump tracebacks
-faulthandler.register(signal.SIGUSR2, file=sys.stderr, all_threads=True)
+faulthandler.enable()                                                  # crash-time tracebacks
+faulthandler.register(signal.SIGUSR2, file=sys.stderr, all_threads=True)  # on-demand stack dump
 ```
 
-Then from another shell on the same compute node:
+To trigger the on-demand dump from another shell on the same compute node:
 
 ```bash
-kill -USR2 <pid>          # dump every thread's stack to stderr
+# From another login shell, ssh to the compute node first:
+ssh c019                  # or whichever node Slurm placed your job on
+kill -USR2 <python-pid>   # find the PID with: ps -fu $USER | grep python
 ```
 
-`SIGUSR1` is reserved for time-limit shutdown (below); `SIGUSR2` carries the live stack dump. `py-spy dump --pid <pid>` is even better when available; it works without changing your code. Log queue depth, worker start/finish, and output counts at INFO — a silent pipeline is painful to debug.
+Why `SIGUSR2` and not `SIGUSR1`? `SIGUSR1` is the signal we use for time-limit shutdown (see "Handle time-limit interruption" below). Splitting them means you can request a stack dump *and* later request a clean shutdown without the two getting confused.
+
+Aside from `faulthandler`, the cheapest debug tool is logging. Log queue depth, worker start/finish, and output counts at INFO. A silent pipeline is painful to debug.
 
 ## When to use Slurm arrays instead
 
@@ -291,30 +311,35 @@ for task in tasks:
 
 Pair with `#SBATCH --signal=USR1@300` for a 5-minute warning before the time limit, and with skip-if-exists outputs so reruns pick up where the last job left off.
 
-The launch line must let SIGUSR1 reach the Python process. Tested on this cluster:
+### Why `srun .venv/bin/python` and not `uv run python`
+
+The launch line has to let SIGUSR1 reach the Python process. I tested this on the cluster (jobs 571645–571648 with a real `uv sync --frozen` venv on `default_queue`), here's what happened:
+
+| Launch line | What happens to SIGUSR1 | Result |
+|---|---|---|
+| `srun .venv/bin/python script.py` | Slurm delivers SIGUSR1 to the srun step → Python's handler fires | **Clean shutdown** at t=71s, exit 0 |
+| `srun uv run python script.py` | `uv run` is the foreground process; uv has no SIGUSR1 handler and dies on the default action before exec'ing through to Python | Job FAILED, `srun: error: User defined signal 1` |
+| `python script.py` (no `srun`) | Slurm sends SIGUSR1 to the step, but bare bash + child python doesn't propagate it to the Python child | TIMEOUT, Python never saw it |
+| `#SBATCH --signal=B:USR1@N` (with the `B:` prefix) | Slurm sends SIGUSR1 to the batch shell only; bash dies on the default action, killing Python | Job FAILED |
+
+So:
 
 ```bash
-#SBATCH --signal=USR1@300
+#SBATCH --signal=USR1@300                                           # not B:USR1@300
 # Environment was built during setup with: uv sync --frozen
-srun .venv/bin/python src/main.py
+srun .venv/bin/python src/main.py                                   # not uv run python
 ```
 
-These do **not** reliably deliver SIGUSR1 to Python and will SIGKILL your job at the time limit instead:
-
-- `#SBATCH --signal=B:USR1@300` — sends to the batch shell only; bash dies, Python never sees it.
-- `python src/main.py` directly under bash (no `srun`) — the signal does not propagate from the batch shell to the Python child.
-- `srun uv run python src/main.py` — `uv run` is the foreground process; it has no SIGUSR1 handler and dies on the default action before Python can react.
-
-Run Python as the `srun` step directly (`srun .venv/bin/python ...`) so the signal lands on Python.
+Why does this matter when `uv run` is otherwise great? `uv run` is a thin Rust wrapper that resolves the project's environment and execs Python — but it sits in the process tree as the immediate child of `srun`, and it does not install a SIGUSR1 handler before exec'ing. When Slurm fires the warning signal, uv catches it, has nothing to do with it, and dies. Python never gets a chance to run its handler. By calling `.venv/bin/python` directly, you skip the wrapper for the actual job entry, and Python is the foreground process that receives signals. (For short exploratory runs that won't hit a time limit, `uv run python ...` is still fine — see [running Python](../running-python/SKILL.md#safe-python-slurm-template).)
 
 ## Checklist
 
 - [ ] Bottleneck is known: CPU, I/O, database, network, GPU, or filesystem.
-- [ ] Worker count comes from `SLURM_CPUS_PER_TASK`.
+- [ ] Worker count comes from `SLURM_CPUS_PER_TASK` with a laptop-friendly fallback (`os.cpu_count()`).
 - [ ] Only one main layer of parallelism; nested layers are pinned to 1.
 - [ ] `spawn` is used when CUDA, threads, or open handles are involved.
 - [ ] Expensive per-worker state is loaded in an `initializer`, not on every task.
-- [ ] Queue pipelines use bounded queues, one sentinel per worker, `task_done()` in `finally`, and one writer started before workers.
+- [ ] Queue pipelines use bounded queues, one quit signal per worker, `task_done()` in `finally`, and one writer started before workers.
 - [ ] Logging happens in the parent unless workers genuinely need their own stream.
 - [ ] `faulthandler.enable()` is called at startup; `SIGUSR2` is registered for live stack dumps on long jobs.
 - [ ] Independent multi-minute tasks use Slurm arrays, not multiprocessing.
@@ -328,7 +353,6 @@ Run Python as the `srun` step directly (`srun .venv/bin/python ...`) so the sign
 - [`concurrent.futures`](https://docs.python.org/3/library/concurrent.futures.html) — `ProcessPoolExecutor`, `as_completed`, `map`.
 - [`logging.handlers.QueueListener`](https://docs.python.org/3/library/logging.handlers.html#queuelistener) — process-safe logging.
 - [`faulthandler`](https://docs.python.org/3/library/faulthandler.html) — stack dumps on crash or signal.
-- [py-spy](https://github.com/benfred/py-spy) — sampling profiler and live `dump` for stuck processes.
 - [joblib](https://joblib.readthedocs.io/en/stable/) — `Parallel`/`delayed`, memoization.
 - [Dask](https://docs.dask.org/en/stable/) and [Ray](https://docs.ray.io/en/latest/) — when one node isn't enough.
 - [Slurm job arrays](https://slurm.schedmd.com/job_array.html) — for embarrassingly-parallel tasks at the scheduler layer.

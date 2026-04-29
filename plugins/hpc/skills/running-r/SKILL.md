@@ -134,7 +134,8 @@ Prefer clear errors and command-line arguments over editing paths inside scripts
 ## Read Slurm settings in R
 
 ```r
-n_cpus <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "1"))
+slurm_cpus <- Sys.getenv("SLURM_CPUS_PER_TASK", "")
+n_cpus <- if (nzchar(slurm_cpus)) as.integer(slurm_cpus) else parallel::detectCores()
 job_id <- Sys.getenv("SLURM_JOB_ID", "local")
 message("job_id=", job_id, " n_cpus=", n_cpus)
 

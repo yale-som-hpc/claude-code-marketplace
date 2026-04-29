@@ -28,6 +28,8 @@ These are slightly opinionated picks. Each has a one-line "why on the cluster."
 - **`logging`** as the baseline (configured below). `loguru` is fine when its structured output materially helps incident debugging.
 - **`pyproject.toml` + `uv.lock` committed; `.venv/` gitignored.** The lockfile is what makes runs reproducible across login and compute nodes.
 
+How to install the tools themselves: see [installing software](../installing-software/SKILL.md) for `uv` (one curl command into `~/.local/bin`). Once `uv` is on your PATH, `ruff`, `pyrefly`, and `pytest` go in your project's dev dependencies via `uv add --dev ruff pyrefly pytest`, so they reproduce from `uv.lock` like everything else.
+
 ## Project setup with uv
 
 ```bash
@@ -57,6 +59,7 @@ For most cluster work, these are the right defaults:
 - **Tabular reads/writes** → [Polars](https://pola.rs/) for new code (uses your CPU allocation through threading and lazy `scan_*`); pandas at API boundaries (sklearn, statsmodels, plotting). Convert with `.to_pandas()` only at the boundary; round-tripping doubles memory.
 - **File format** → Parquet with `compression="zstd"`. One reused Parquet beats 10k CSVs both for speed and for GPFS metadata health.
 - **Lazy reads** → `pl.scan_csv` / `pl.scan_parquet` push filters and column projection before materialization, keeping memory under your `--mem` limit.
+- **Append-heavy / streaming output** → JSONL with gzip is the simplest correct option for record-by-record writes (one append-only file, atomic at line granularity). For columnar appends, write **one Parquet per task or per chunk** (`out/task_0001.parquet`, `out/task_0002.parquet`, …) and read them back with `pl.scan_parquet("out/*.parquet")`. Do not mutate one big Parquet in place. See [using the filesystem](../using-the-filesystem/SKILL.md) for the full append patterns.
 - **SQL over local files** → DuckDB. Joins CSV/Parquet/JSON without staging.
 - **Local cache / lookup tables** → SQLite with `PRAGMA journal_mode=WAL`; one connection per process; keep writes single-writer.
 - **Multi-user database** → `psycopg` with `psycopg_pool`; create one pool per process if you fork.
@@ -94,12 +97,20 @@ For short, exploratory one-off jobs where signal-based shutdown does not matter,
 
 ## Read Slurm settings safely
 
+`SLURM_*` env vars are only set inside Slurm jobs. The patterns below let the same script run on your laptop (no Slurm) and on the cluster (Slurm fills in real values):
+
 ```python
 import os
 
-n_cpus = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+# Slurm allocation when running under sbatch/srun, fall back to the
+# laptop's CPU count for local testing.
+n_cpus = int(os.environ.get("SLURM_CPUS_PER_TASK", "0")) or os.cpu_count() or 1
+
+# "local" is a useful sentinel for log file names off-cluster.
 job_id = os.environ.get("SLURM_JOB_ID", "local")
 ```
+
+The first line reads as "use Slurm's CPU count if it's set, else `os.cpu_count()`, else 1." On the cluster you get the allocation; on a laptop you get the local CPU count; in a constrained container you still get a sensible non-zero number.
 
 ## Logging
 
@@ -127,7 +138,7 @@ Minimal rule: match worker count to allocated CPUs.
 from concurrent.futures import ProcessPoolExecutor
 import os
 
-n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+n_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", "0")) or os.cpu_count() or 1
 
 with ProcessPoolExecutor(max_workers=n_workers) as pool:
     results = list(pool.map(run_one_task, tasks))
@@ -181,7 +192,7 @@ print(torch.cuda.get_device_name(0))
 - [ ] `uv sync --frozen` runs at setup, never inside arrays or jobs.
 - [ ] Slurm script sets `OMP/MKL/OPENBLAS/NUMEXPR_NUM_THREADS` and `PYTHONUNBUFFERED=1`.
 - [ ] Long or resumable jobs launch with `srun .venv/bin/python ...`, not `uv run python ...`, so SIGUSR1 reaches Python.
-- [ ] Python reads `SLURM_CPUS_PER_TASK` with default `"1"`.
+- [ ] Python reads `SLURM_CPUS_PER_TASK` with a laptop-friendly fallback (`os.cpu_count()`).
 - [ ] Multiprocessing workers do not exceed allocated CPUs.
 - [ ] Outputs are skip-if-exists and atomically written.
 - [ ] Logs include job ID and key progress messages.

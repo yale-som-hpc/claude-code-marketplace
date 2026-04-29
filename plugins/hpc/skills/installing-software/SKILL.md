@@ -136,33 +136,17 @@ Use Apptainer when:
 - a Docker image already exists
 
 
-## Avoid conda by default
+## For Python: use uv
 
-Conda can work, but it is a poor default on shared GPFS. Each environment adds tens of thousands of small files, which inflates GPFS metadata load for every user — not just you. Solves are also slow, and one-off environments are hard to reproduce. Prefer:
-
-- `uv` for Python projects
-- modules for cluster-provided system software
-- Apptainer for complex binary stacks
-- static/musl binaries for standalone tools
-
-Avoid these patterns:
+System Python, `pip install --user`, and conda environments all leak state between projects, slow down GPFS, or both. `uv` is the way.
 
 ```bash
-sudo apt install something        # no sudo
-conda create -n job_$SLURM_JOB_ID # inode bomb, not reproducible
-pip install --user package        # hard to reproduce
+cd /gpfs/project/myproject/code
+uv add polars pyarrow duckdb
+uv sync --frozen
 ```
 
-Prefer project lockfiles and local binary installs.
-
-## A note on pip
-
-`pip` itself is not the problem; two specific patterns are:
-
-- **`pip install --user`** writes to `~/.local/lib/pythonX.Y/site-packages`, which is shared across every project and Python version on your account. The state silently leaks between projects, so a fix in one project breaks another. Hard to reproduce, hard to clean up.
-- **`pip install` inside a Slurm job** mutates the environment in flight. If the install pulls a different version on a rerun (e.g. a transitive dep released a new wheel), your "same" array job behaves differently across tasks. Also a metadata storm if hundreds of array tasks all install at once.
-
-Use `uv add <pkg>` + `uv sync --frozen` at setup time on a login node. The lockfile is what makes `srun .venv/bin/python ...` produce the same answer next month.
+`uv add` + `uv sync --frozen` at setup time on a login node. Then jobs run `srun .venv/bin/python ...`. Never `pip install --user`, never `conda create -n job_$SLURM_JOB_ID`, never `pip install` inside a Slurm array. Commit `pyproject.toml` and `uv.lock`.
 
 ## Checklist
 
