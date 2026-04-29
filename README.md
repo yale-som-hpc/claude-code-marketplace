@@ -4,8 +4,8 @@ This repo is a [Claude Code](https://docs.claude.com/en/docs/claude-code) plugin
 
 The skills are written for two pillars:
 
-1. **Be polite.** This is a shared instrument. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
-2. **Be skillful.** Get correct results from the smallest resource request.
+1. **Be polite.** The HPC is a shared resources. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
+2. **Be skillful.** Get your research done swiftly, beautifully, and correctly.
 
 ## What's in the `hpc` plugin
 
