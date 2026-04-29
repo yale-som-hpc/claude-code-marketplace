@@ -20,3 +20,4 @@ Validation checks to automate later:
 - No lingering `TODO` markers.
 - No `--ip=0.0.0.0` in tunnel examples.
 - Slurm examples set thread variables unless explicitly exempted.
+- Python parallel examples choose one main layer of parallelism and avoid oversubscribing Slurm allocations.

@@ -5,6 +5,7 @@ description: Run Python projects with uv, Slurm, thread control, logging, and sa
 related:
   - installing-software
   - managing-jobs
+  - parallel-python
   - working-with-large-data
   - using-gpus
   - acquiring-data
@@ -82,7 +83,9 @@ Use logs to know what happened without opening notebooks.
 
 ## Multiprocessing
 
-Match worker count to allocated CPUs:
+For nontrivial multiprocessing, producer-consumer queues, process pools, or job-stealing-style work, use [parallel Python](./parallel-python.md).
+
+Minimal rule: match worker count to allocated CPUs.
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
