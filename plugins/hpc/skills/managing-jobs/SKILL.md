@@ -25,6 +25,13 @@ scontrol show job 12345          # detailed job state
 sinfo -s                         # partition summary
 ```
 
+Common job states: `R` is running, `PD` is pending, and `CG` is completing. If a job stays pending unusually long, inspect the reason instead of just waiting; the request may not fit available nodes, memory, GPUs, partition limits, or time limits.
+
+```bash
+squeue --me --start
+scontrol show job JOBID
+```
+
 ## Safe Slurm template
 
 ```bash

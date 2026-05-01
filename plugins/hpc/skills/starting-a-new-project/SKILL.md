@@ -36,6 +36,8 @@ Rule: make the project understandable to a new RA and restartable by a future yo
 
 ## First commands
 
+For collaborative work, request a shared `/gpfs/project/...` folder from SOM IT instead of coordinating through one person's home directory. Put shared data, scripts, logs, and outputs there so permissions and ownership match the project.
+
 ```bash
 mkdir -p /gpfs/project/myproject/{code,data/raw,data/derived,output,logs,cache}
 cd /gpfs/project/myproject/code
