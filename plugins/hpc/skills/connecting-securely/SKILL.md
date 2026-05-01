@@ -72,7 +72,9 @@ ssh-add -l
 ssh -T git@github.com
 ```
 
-Inside tmux, SSH agent sockets can go stale. If GitHub auth worked yesterday and fails today, restart the shell or refresh `SSH_AUTH_SOCK` from the current login session.
+Inside tmux or a long-running shell, `SSH_AUTH_SOCK` can go stale. The value is only a path to the forwarded agent socket created by your current SSH login; it is not the key itself. If GitHub auth worked yesterday and fails today, do not copy keys to the cluster. Start a fresh SSH login, restart the shell, or look into refreshing `SSH_AUTH_SOCK` so it points at a current working socket owned by you.
+
+Principle: fix the pointer to your forwarded agent, not the location of your private key.
 
 ## GitHub from the cluster
 
