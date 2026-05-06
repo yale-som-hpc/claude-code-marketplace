@@ -42,6 +42,8 @@ For running jobs, `py-spy dump --pid PID` is often more useful if available.
 
 ## Prefer query engines for data work
 
+DuckDB — SQL over Parquet, with predicate and projection pushdown:
+
 ```python
 import duckdb
 
@@ -55,11 +57,26 @@ COPY (
 """)
 ```
 
-This is often faster and simpler than writing Python loops.
+Polars — lazy expressions with a streaming sink:
 
-## Numba for tight numeric loops
+```python
+import polars as pl
 
-Use Numba when you have loops over NumPy arrays and Python overhead dominates.
+(
+    pl.scan_parquet("/gpfs/project/myproject/data/raw/*.parquet")
+    .filter(pl.col("score").is_not_null())
+    .select("id", "score")
+    .sink_parquet("/gpfs/project/myproject/data/derived/scores.parquet")
+)
+```
+
+Both push filters and projections down into the Parquet reader and stream the result — neither materializes the full table in Python. Reach for whichever idiom matches your code (SQL vs. dataframe expressions). Either is usually faster and simpler than a hand-written Python loop.
+
+## Numba
+
+Numba is a just-in-time compiler that translates a subset of Python and NumPy to native code via LLVM. Reach for it when you have tight loops over NumPy arrays and Python interpreter overhead dominates — not as a general "make Python fast" knob.
+
+### Basic usage
 
 ```python
 import numpy as np
@@ -75,7 +92,7 @@ def scale(arr):
 
 Use `cache=True` so compiled code is reused across runs. `nogil=True` is redundant under `@njit` and adds noise — leave it off.
 
-## Parallel Numba
+### Parallel loops
 
 `prange` is parallel only with `parallel=True`.
 
@@ -90,7 +107,7 @@ def add_one(arr):
 
 Parallelize the outer loop. Nested inner-loop `prange` often gives little speedup.
 
-## Avoid race conditions
+### Avoiding race conditions
 
 Bad:
 
@@ -103,7 +120,7 @@ def count_bad(counts, idx):
 
 Multiple workers can update the same `counts` element. Use per-worker accumulators and reduce, or use a serial loop if correctness matters more than speed. For sparse scatter-add patterns where the parallel speedup is modest, `np.add.at(counts, idx, 1)` outside Numba is thread-safe and clear.
 
-## Compilation tax
+### Compilation tax
 
 Numba compiles on first call. Benchmark steady-state runtime separately from compile time:
 

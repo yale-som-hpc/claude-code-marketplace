@@ -47,23 +47,9 @@ If Slurm gives you 4 CPUs, do not start 32 workers. If each worker calls BLAS/Nu
 
 This is the single biggest waste pattern on the cluster.
 
-Bad:
+Bad: 500 Slurm array tasks × 16 Python processes × 8 BLAS threads = 64,000 runnable threads.
 
-```text
-500 Slurm array tasks × 16 Python processes × 8 BLAS threads = 64,000 runnable threads
-```
-
-Good:
-
-```text
-50 concurrent Slurm tasks × 1 Python process × 1 BLAS thread
-```
-
-or:
-
-```text
-1 Slurm job × 16 Python processes × 1 BLAS thread
-```
+Good: 50 concurrent Slurm tasks × 1 Python process × 1 BLAS thread; or: 1 Slurm job × 16 Python processes × 1 BLAS thread
 
 Pick one main layer of parallelism. If you genuinely need two layers, document why and pin the others to 1.
 
@@ -313,14 +299,14 @@ Pair with `#SBATCH --signal=USR1@300` for a 5-minute warning before the time lim
 
 ### Why `srun .venv/bin/python` and not `uv run python`
 
-The launch line has to let SIGUSR1 reach the Python process. I tested this on the cluster (jobs 571645–571648 with a real `uv sync --frozen` venv on `default_queue`), here's what happened:
+The launch line has to let SIGUSR1 reach the Python process. Tested on `default_queue` with a `uv sync --frozen` venv:
 
 | Launch line | What happens to SIGUSR1 | Result |
 |---|---|---|
-| `srun .venv/bin/python script.py` | Slurm delivers SIGUSR1 to the srun step → Python's handler fires | **Clean shutdown** at t=71s, exit 0 |
-| `srun uv run python script.py` | `uv run` is the foreground process; uv has no SIGUSR1 handler and dies on the default action before exec'ing through to Python | Job FAILED, `srun: error: User defined signal 1` |
-| `python script.py` (no `srun`) | Slurm sends SIGUSR1 to the step, but bare bash + child python doesn't propagate it to the Python child | TIMEOUT, Python never saw it |
-| `#SBATCH --signal=B:USR1@N` (with the `B:` prefix) | Slurm sends SIGUSR1 to the batch shell only; bash dies on the default action, killing Python | Job FAILED |
+| `srun .venv/bin/python script.py` | Slurm delivers it to the srun step → Python's handler fires | **Clean shutdown** |
+| `srun uv run python script.py` | `uv run` is the foreground process and installs no SIGUSR1 handler — dies on the default action before exec'ing through to Python | Job FAILED |
+| `python script.py` (no `srun`) | Slurm signals the step but bash + child Python doesn't propagate to the child | TIMEOUT |
+| `#SBATCH --signal=B:USR1@N` | The `B:` prefix routes only to the batch shell; bash dies on the default action and kills Python | Job FAILED |
 
 So:
 
@@ -330,7 +316,7 @@ So:
 srun .venv/bin/python src/main.py                                   # not uv run python
 ```
 
-Why does this matter when `uv run` is otherwise great? `uv run` is a thin Rust wrapper that resolves the project's environment and execs Python — but it sits in the process tree as the immediate child of `srun`, and it does not install a SIGUSR1 handler before exec'ing. When Slurm fires the warning signal, uv catches it, has nothing to do with it, and dies. Python never gets a chance to run its handler. By calling `.venv/bin/python` directly, you skip the wrapper for the actual job entry, and Python is the foreground process that receives signals. (For short exploratory runs that won't hit a time limit, `uv run python ...` is still fine — see [running Python](../running-python/SKILL.md#safe-python-slurm-template).)
+For short exploratory runs that won't hit the time limit, `uv run python` is fine — see [running Python](../running-python/SKILL.md#safe-python-slurm-template).
 
 ## Checklist
 

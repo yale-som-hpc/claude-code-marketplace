@@ -7,7 +7,7 @@ related:
   - running-r
   - connecting-securely
   - using-the-filesystem
-updated: 2026-04-29
+updated: 2026-05-06
 ---
 # Installing Software
 
@@ -45,30 +45,16 @@ mkdir -p ~/.local/bin ~/go/bin
 export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 ```
 
-Good candidates:
+Prefer statically-linked builds from GitHub releases if available. Inspect "curl to sh" install patterns prior to using those. Common per-user tools:
 
-- `uv`
-- `gh`
-- `jq`
-- `ripgrep`
-- `croc`
-- `rclone`
+- `uv` — Python project manager (install snippet below).
+- `duckdb` — CLI for SQL over Parquet/CSV/JSON; not module-loadable on the cluster. See [working with large data](../working-with-large-data/SKILL.md#installing-the-cli-tools).
+- `qsv` — fast CSV triage; not module-loadable. Same place.
+- `gh` — GitHub CLI.
+- `jq` — JSON on the command line.
+- `ripgrep` — fast recursive grep.
+- `croc`, `rclone` — file transfer (see [using the filesystem](../using-the-filesystem/SKILL.md#moving-files)).
 
-## XDG directories
-
-Keep caches out of crowded home directories when possible:
-
-```bash
-export XDG_CACHE_HOME="/gpfs/scratch60/$USER/.cache"
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-```
-
-Create them:
-
-```bash
-mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" ~/.local/bin
-```
 
 ## Prefer static or musl binaries
 
@@ -147,6 +133,22 @@ uv sync --frozen
 ```
 
 `uv add` + `uv sync --frozen` at setup time on a login node. Then jobs run `srun .venv/bin/python ...`. Never `pip install --user`, never `conda create -n job_$SLURM_JOB_ID`, never `pip install` inside a Slurm array. Commit `pyproject.toml` and `uv.lock`.
+
+## XDG directories
+
+Keep caches out of crowded home directories when possible:
+
+```bash
+export XDG_CACHE_HOME="/gpfs/scratch60/$USER/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+```
+
+Create them:
+
+```bash
+mkdir -p "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" ~/.local/bin
+```
 
 ## Checklist
 

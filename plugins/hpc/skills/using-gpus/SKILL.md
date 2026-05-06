@@ -19,7 +19,7 @@ GPUs are the scarcest resource on the cluster. An idle interactive GPU session �
 
 ## Account for every GPU-hour
 
-Treat each requested GPU-hour as compute somebody else cannot use. The cluster has finite GPUs, the H100 partition has only four cards total, and per-user GPU caps are likely to be enforced before any other resource. The way to stay ahead of that is to cancel idle GPU jobs the instant you notice them — `scancel JOBID` — and never request more GPUs than your code uses.
+Treat each requested GPU-hour as compute somebody else cannot use. The cluster has finite GPUs, the H100 partition has only four cards total (soon eight), and per-user GPU caps are likely to be enforced before any other resource. The way to stay ahead of that is to cancel idle GPU jobs the instant you notice them — `scancel JOBID` — and never request more GPUs than your code uses.
 
 ## Do you need a GPU?
 

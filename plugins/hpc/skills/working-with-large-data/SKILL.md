@@ -7,7 +7,7 @@ related:
   - using-the-filesystem
   - acquiring-data
   - self-diagnosing-resource-use
-updated: 2026-04-28
+updated: 2026-05-06
 ---
 # Working with Large Data
 
@@ -29,6 +29,24 @@ Avoid:
 - repeated CSV parsing
 - Excel as an intermediate format
 
+## Installing the CLI tools
+
+Neither `duckdb` nor `qsv` is module-loadable on the cluster (verified May 2026: `module spider duckdb` and `module spider qsv` both return "Unable to find"). Install them as static binaries in `~/.local/bin` — see [installing software](../installing-software/SKILL.md#user-binaries) for the broader pattern and PATH setup:
+
+```bash
+mkdir -p ~/.local/bin
+
+# DuckDB CLI — single static binary, latest release
+curl -L https://github.com/duckdb/duckdb/releases/latest/download/duckdb_cli-linux-amd64.zip -o /tmp/duckdb.zip
+unzip -o /tmp/duckdb.zip -d ~/.local/bin && rm /tmp/duckdb.zip
+duckdb --version
+
+# qsv — pick the musl prebuild (x86_64-unknown-linux-musl) from
+# https://github.com/jqnatividad/qsv/releases ; same drop-in install.
+```
+
+Inside Python projects, you also get DuckDB via `uv add duckdb` — that's the *library* (`import duckdb`); the command-line `duckdb` is a separate binary, both backed by the same engine. Use the CLI for ad-hoc inspection, the library inside scripts.
+
 ## Quick command-line inspection
 
 Use DuckDB before writing a script:
@@ -45,7 +63,7 @@ Convert reusable extracts to Parquet:
 duckdb -c "COPY (SELECT * FROM 'data.csv') TO 'data.parquet' (FORMAT PARQUET)"
 ```
 
-If `qsv` is installed, it is useful for fast CSV triage:
+`qsv` is useful for fast CSV triage (install above):
 
 ```bash
 qsv stats data.csv

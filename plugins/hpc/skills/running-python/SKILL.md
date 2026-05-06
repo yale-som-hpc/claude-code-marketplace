@@ -9,7 +9,7 @@ related:
   - working-with-large-data
   - using-gpus
   - acquiring-data
-updated: 2026-04-29
+updated: 2026-05-06
 ---
 # Running Python
 
@@ -17,9 +17,15 @@ Rule: use a project environment, control threads, log clearly, and make outputs 
 
 ## Tooling defaults
 
-These are slightly opinionated picks. Each has a one-line "why on the cluster."
+**Use `uv`.** It is the package manager for cluster Python work; everything below assumes it. Don't reach for conda, mamba, poetry, pipenv, pip-tools, or `pip install --user` — uv supersedes all of them. Why specifically uv on this cluster:
 
-- **`uv`** for dependencies, lockfiles, and Python interpreter management. Faster than conda on GPFS, and the lockfile reproduces on a compute node.
+- **Single tool** for dependencies, lockfile, virtualenv, *and* Python interpreter — no module/conda/pyenv stack to coordinate. The system Python on Yale SOM HPC is 3.9.18; modules give you 3.11; uv downloads 3.12 / 3.13 / 3.14 on demand and pins it to your project (`pyproject.toml`'s `requires-python`).
+- **Lockfile (`uv.lock`) is built-in** and resolves identically on the login node, compute node, and your laptop — no `conda env export` games, no "works on my machine."
+- **10–100× faster than conda on GPFS.** A `uv sync --frozen` is a few seconds; a `conda env create` is a multi-minute metadata storm because conda writes thousands of small files into one directory.
+- **Single `.venv` directory** in your project — easy to inspect, easy to nuke, easy to atomically swap.
+
+These pair with uv:
+
 - **`ruff`** for lint + format. Catches mistakes locally before burning a Slurm allocation.
 - **`pyrefly`** for type checking. Same reason as ruff.
 - **`pytest`** for tests. Smoke tests on small inputs save many cluster reruns.
@@ -32,12 +38,16 @@ How to install the tools themselves: see [installing software](../installing-sof
 
 ## Project setup with uv
 
+Pin a recent Python in `pyproject.toml` and let uv install it — don't depend on the cluster's system `python3` (3.9.18 as of May 2026, old enough that NumPy 2.x and many libraries are dropping support) or `module load python/3.11.x` (a single version, can change between maintenance windows):
+
 ```bash
 cd /gpfs/project/myproject/code
-uv init --app
+uv init --app --python 3.13
 uv add polars pyarrow duckdb
 uv sync --frozen
 ```
+
+`uv python list` shows what's available; `uv python install 3.13` downloads it into `~/.local/share/uv/python/` (~50 MB per version) if uv hasn't already. The pinned version is recorded as `requires-python` in `pyproject.toml`, so anyone running `uv sync` on this project gets the same interpreter. 3.13 is the right default in May 2026; drop to 3.12 if a critical dependency lags.
 
 This is a setup-time operation, run once on a login node. Do not run `uv sync` inside Slurm jobs or job arrays — environment mutation in flight is a waste pattern (and `--frozen` makes it explicit that the lockfile is the source of truth).
 
@@ -50,7 +60,7 @@ uv.lock
 
 Do not commit `.venv/`; put it in `.gitignore`.
 
-Avoid `pip install --user` and `pip install` inside jobs. They are not reproducible and they leak state between projects. If you need a one-off package, `uv add` and `uv sync --frozen` is the path. (Pip itself is fine; the bad defaults are `--user` and per-job installs.) See [installing software](../installing-software/SKILL.md) for the broader picture.
+Don't `pip install --user` or run `pip install` inside jobs — neither is reproducible and both leak state between projects. For a one-off package, `uv add <pkg>` then `uv sync --frozen`. See [installing software](../installing-software/SKILL.md) for the broader picture.
 
 ## Data work, default picks
 
@@ -61,7 +71,7 @@ For most cluster work, these are the right defaults:
 - **Lazy reads** → `pl.scan_csv` / `pl.scan_parquet` push filters and column projection before materialization, keeping memory under your `--mem` limit.
 - **Append-heavy / streaming output** → JSONL with gzip is the simplest correct option for record-by-record writes (one append-only file, atomic at line granularity). For columnar appends, write **one Parquet per task or per chunk** (`out/task_0001.parquet`, `out/task_0002.parquet`, …) and read them back with `pl.scan_parquet("out/*.parquet")`. Do not mutate one big Parquet in place. See [using the filesystem](../using-the-filesystem/SKILL.md) for the full append patterns.
 - **SQL over local files** → DuckDB. Joins CSV/Parquet/JSON without staging.
-- **Local cache / lookup tables** → SQLite with `PRAGMA journal_mode=WAL`; one connection per process; keep writes single-writer.
+- **Per-project SQL state — catalogs, progress, lookups, OLTP-style writes** → SQLite with WAL (`PRAGMA journal_mode=WAL`, `synchronous=NORMAL`, `busy_timeout=15000`). Handles concurrent writers (serialized via file locking) and non-blocking readers; fine on GPFS and on compute-node `/local`. The full pragma set + a batched `ArtifactWriter` pattern live in [acquiring data](../acquiring-data/SKILL.md#store-raw--metadata).
 - **Multi-user database** → `psycopg` with `psycopg_pool`; create one pool per process if you fork.
 - **Unknown encodings** → `charset-normalizer` to detect, then pass `encoding=` explicitly.
 
@@ -188,7 +198,8 @@ print(torch.cuda.get_device_name(0))
 
 ## Checklist
 
-- [ ] Project uses `uv` and committed `uv.lock`.
+- [ ] Project uses `uv` (not conda / poetry / pipenv / pip+venv); `pyproject.toml` and `uv.lock` are committed.
+- [ ] `pyproject.toml` pins a recent Python via `requires-python` (e.g. `>=3.13`); the project does not depend on system `python3` or `module load python`.
 - [ ] `uv sync --frozen` runs at setup, never inside arrays or jobs.
 - [ ] Slurm script sets `OMP/MKL/OPENBLAS/NUMEXPR_NUM_THREADS` and `PYTHONUNBUFFERED=1`.
 - [ ] Long or resumable jobs launch with `srun .venv/bin/python ...`, not `uv run python ...`, so SIGUSR1 reaches Python.

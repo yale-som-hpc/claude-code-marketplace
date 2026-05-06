@@ -30,7 +30,7 @@ Current as of 2026-04-28. Verify live details with `sinfo -s` when generating pr
 
 - Scheduler: Slurm. Module system: Lmod (Spack-built; users run `module load`, never `spack`).
 - Main partitions: `default_queue` (4h max, mixed CPU/A40), `cpunormal`, `gpunormal` (RTX 8000/A100, 3 GPUs per A100 node), `h100` (one node, 4 H100s — scarcest resource on the cluster), `build`.
-- `/gpfs/project/` for shared team projects (request via somit@yale.edu). `/gpfs/scratch60/$USER/` for scratch (clean it). Compute node `/tmp` is local and ephemeral.
+- `/gpfs/project/` for shared team projects (request via somit@yale.edu). `/gpfs/scratch60/$USER/` for scratch (clean it). Each compute node also has local `/tmp` (~20 GB NVMe), `/local` (~700 GB NVMe), and `/dev/shm` (RAM-backed, ~half the node's memory) — all per-node and *not* auto-cleaned by Slurm. See [using the filesystem](../using-the-filesystem/SKILL.md#compute-node-local-storage).
 - `$HOME` is `/home/$USER`, same as `/gpfs/home/$USER`.
 - `KillWait=30`: after final `SIGTERM`, jobs have ~30 seconds before `SIGKILL`. Too short to rely on for checkpointing.
 
