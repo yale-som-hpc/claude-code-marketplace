@@ -8,34 +8,59 @@ This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin ma
 
 The skills were developed with two goals in mind.
 
-1. **Be skillful.** Get your research done swiftly, beautifully, and correctly.
-2. **Be polite.** The HPC is a shared resources. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
+1. **Be skillful.** Right-sized jobs start sooner. The right tool runs an order of magnitude faster. Atomic writes don't lose your weekend's work. Skill is mostly selfish — your research, your time, your results.
+2. **Be polite.** The HPC is a shared resource. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
 
 ## What's in the `hpc` plugin
 
+Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front door, with the mental model, partition layout, and how the rest fit together. Then:
+
+### Connect & set up
+
 | Skill | Purpose |
 |---|---|
-| [overview](plugins/hpc/skills/overview/SKILL.md) | Mental model, partition layout, two-pillar manifesto. |
 | [connecting-securely](plugins/hpc/skills/connecting-securely/SKILL.md) | SSH keys, config, agents, Jupyter tunnels. |
+| [starting-a-new-project](plugins/hpc/skills/starting-a-new-project/SKILL.md) | Reproducible project layout. |
+| [installing-software](plugins/hpc/skills/installing-software/SKILL.md) | Modules, uv, static binaries, Apptainer. |
+
+### Run jobs
+
+| Skill | Purpose |
+|---|---|
 | [managing-jobs](plugins/hpc/skills/managing-jobs/SKILL.md) | sbatch, arrays, dependencies, right-sizing loop. |
 | [using-gpus](plugins/hpc/skills/using-gpus/SKILL.md) | When to request GPUs and how to verify they're used. |
 | [using-the-filesystem](plugins/hpc/skills/using-the-filesystem/SKILL.md) | GPFS, project space, scratch, atomic writes. |
-| [installing-software](plugins/hpc/skills/installing-software/SKILL.md) | Modules, uv, static binaries, Apptainer. |
-| [starting-a-new-project](plugins/hpc/skills/starting-a-new-project/SKILL.md) | Reproducible project layout. |
 | [running-python](plugins/hpc/skills/running-python/SKILL.md) | uv, Slurm, thread control, resumable tasks. |
 | [parallel-python](plugins/hpc/skills/parallel-python/SKILL.md) | Worker sizing, spawn-vs-fork, nested-parallelism warning. |
 | [accelerating-python](plugins/hpc/skills/accelerating-python/SKILL.md) | DuckDB, Polars, Numba, when to add parallelism. |
 | [running-r](plugins/hpc/skills/running-r/SKILL.md) | renv, Rscript Slurm jobs, BLAS thread control. |
 | [running-stata](plugins/hpc/skills/running-stata/SKILL.md) | Batch do-files, scratch temp, license courtesy. |
+
+### Work with data
+
+| Skill | Purpose |
+|---|---|
 | [working-with-large-data](plugins/hpc/skills/working-with-large-data/SKILL.md) | Parquet, columnar formats, query engines. |
 | [acquiring-data](plugins/hpc/skills/acquiring-data/SKILL.md) | WRDS, REST APIs, scraping, connection pooling, request-hash caches. |
+
+### Diagnose
+
+| Skill | Purpose |
+|---|---|
 | [self-diagnosing-resource-use](plugins/hpc/skills/self-diagnosing-resource-use/SKILL.md) | sacct, seff, post-job right-sizing. |
 
 ## Install
 
 You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This repo is a [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) — a catalog Claude Code can browse — and `hpc` is the [plugin](https://code.claude.com/docs/en/plugins) inside it that bundles all the skills. To use the skills, you add the marketplace once, then install the plugin from it. Nothing runs on the cluster until you ask Claude to do something there.
 
-Pick the path that matches how you use Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
+**TL;DR** — in any Claude Code session, run:
+
+```
+/plugin marketplace add yale-som-hpc/claude-code-marketplace
+/plugin install hpc@yale-som-hpc
+```
+
+If you'd rather use a GUI, pick the surface below that matches how you use Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
 
 ### Claude Code Desktop app
 
@@ -74,10 +99,6 @@ Inside Claude Code:
 
 Update later with `/plugin marketplace update yale-som-hpc`. The full command list is in the [plugins reference](https://code.claude.com/docs/en/plugins-reference).
 
-### Claude Code on the web (claude.ai/code)
-
-Plugins don't currently run in cloud sessions, which is what the web app uses. Install via one of the local paths above. If you also want collaborators on a specific repo to get the plugin automatically, use the per-project setup below.
-
 ### Per-project (committed to a repo)
 
 If you want every collaborator on a project to get the plugin automatically, commit the marketplace reference into the repo. Add a `.claude/settings.json` like:
@@ -100,15 +121,9 @@ If you want every collaborator on a project to get the plugin automatically, com
 
 Anyone who opens the project in a local Claude Code session (Desktop, VS Code, Cursor, CLI) will be prompted to install the marketplace and plugin the first time they trust the folder. See [Configure team marketplaces](https://code.claude.com/docs/en/discover-plugins#configure-team-marketplaces) for the full reference.
 
-### Verify
+## Verify
 
-Inside Claude Code:
-
-```
-/plugin
-```
-
-You should see `hpc@yale-som-hpc` listed and enabled. Ask Claude something cluster-shaped ("write me an sbatch script for a Polars job on the SOM HPC cluster") and it should pull from the relevant skill.
+Inside Claude Code, run `/plugin`. You should see `hpc@yale-som-hpc` listed and enabled. Ask Claude something cluster-shaped ("write me an sbatch script for a Polars job on the SOM HPC cluster") and it should pull from the relevant skill.
 
 ## Repository layout
 
