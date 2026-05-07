@@ -50,11 +50,11 @@ Run `sinfo -s` for live node-level detail.
 - Need external data, APIs, WRDS, or scraping? Use [acquiring data](../acquiring-data/SKILL.md).
 - Need to check whether a job was wasteful? Use [self-diagnosing resource use](../self-diagnosing-resource-use/SKILL.md).
 
-## Two pillars
+## Two virtues
 
-Everything in these skills supports one of two goals:
+Everything in these skills supports one of two virtues:
 
-**Be polite.** This is a shared instrument. Other people are running jobs right now on the same nodes, GPUs, GPFS metadata servers, and queue.
+**Citizenship.** This is a shared instrument. Other people are running jobs right now on the same nodes, GPUs, GPFS metadata servers, and queue.
 
 - Do not run heavy compute on login nodes — they belong to everyone.
 - Do not hold a GPU you are not actively using. Cancel idle interactive GPU sessions immediately.
@@ -63,7 +63,7 @@ Everything in these skills supports one of two goals:
 - Throttle job arrays (e.g. `%50`). Leave room at the table.
 - Clean up scratch when work is done.
 
-**Be skillful.** Get correct results from the smallest resource request.
+**Skillfulness.** Get correct results from the smallest resource request.
 
 - Request CPU, memory, GPU, and time explicitly; right-size the next job from `seff`/`sacct` output.
 - Use `${SLURM_CPUS_PER_TASK:-1}` for thread environment variables — never bare `$SLURM_CPUS_PER_TASK`.
