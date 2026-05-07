@@ -1,3 +1,5 @@
+.agent-sync
+.agents
 tmp/
 __pycache__/
 *.pyc
