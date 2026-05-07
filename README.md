@@ -8,7 +8,7 @@ This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin ma
 
 The skills were developed with two goals in mind.
 
-1. **Be skillful.** Right-sized jobs start sooner. The right tool runs an order of magnitude faster. Atomic writes don't lose your weekend's work. Skill is mostly selfish — your research, your time, your results.
+1. **Be skillful.** Get your research done swiftly, beautifully, and correctly.
 2. **Be polite.** The HPC is a shared resource. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
 
 ## What's in the `hpc` plugin
