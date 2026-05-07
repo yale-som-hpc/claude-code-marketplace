@@ -35,18 +35,7 @@ The skills were developed with two goals in mind.
 
 You need [Claude Code](https://docs.claude.com/en/docs/claude-code) installed. Skills are loaded by Claude Code's plugin system; nothing runs on the cluster until you ask Claude to do something there.
 
-Pick the path that matches how you use Claude Code.
-
-### Claude Code CLI (terminal)
-
-Available in every Claude Code session on your laptop. Inside Claude Code:
-
-```
-/plugin marketplace add yale-som-hpc/claude-code-marketplace
-/plugin install hpc@yale-som-hpc
-```
-
-Update later with `/plugin marketplace update yale-som-hpc`.
+Pick the path that matches how you use Claude Code. Plugin state is shared per-user, so installing once via any path enables `hpc` in every Claude Code session on your machine.
 
 ### Claude Code in VS Code or Cursor
 
@@ -62,11 +51,22 @@ That opens the **Manage plugins** panel. Switch to the **Marketplaces** tab, cli
 yale-som-hpc/claude-code-marketplace
 ```
 
-Then go back to the **Plugins** tab and install `hpc`. Configuration syncs with the CLI, so the same `/plugin marketplace add ...` command also works inside the VS Code chat box if you prefer typing.
+Then go back to the **Plugins** tab and install `hpc`. If you prefer typing, the CLI commands below also work inside the VS Code or Cursor chat box.
 
-### Claude Code in JetBrains IDEs / Claude Desktop app
+### Claude Code Desktop app
 
-These surfaces do not have a graphical plugin manager. Open a terminal (the JetBrains integrated terminal is fine) and use the CLI install path above. Once installed via CLI, the plugin works in every Claude Code session — including the JetBrains and desktop apps — because plugin state is shared per-user.
+The Desktop app does not have a graphical plugin manager. Open any terminal and use the CLI install path below. Once installed, the plugin shows up in the Desktop app automatically.
+
+### Claude Code CLI (terminal)
+
+Inside Claude Code:
+
+```
+/plugin marketplace add yale-som-hpc/claude-code-marketplace
+/plugin install hpc@yale-som-hpc
+```
+
+Update later with `/plugin marketplace update yale-som-hpc`.
 
 ### Claude Code on the web (claude.ai/code)
 
