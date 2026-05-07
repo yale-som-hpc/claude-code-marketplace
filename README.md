@@ -4,7 +4,7 @@
 
 </div>
 
-This repo is a [Claude Code](https://docs.claude.com/en/docs/claude-code) plugin marketplace of skills for the Yale SOM HPC cluster (`hpc.som.yale.edu`). Install it into Claude Code to help you get work done on the HPC — write great code, submit jobs, request a GPU, set up a project, query WRDS, diagnose problems, etc.
+This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin marketplace of skills for the Yale SOM HPC cluster (`hpc.som.yale.edu`). Install it into Claude Code to help you get work done on the HPC — write great code, submit jobs, request a GPU, set up a project, query WRDS, diagnose problems, etc.
 
 The skills were developed with two goals in mind.
 
@@ -33,29 +33,35 @@ The skills were developed with two goals in mind.
 
 ## Install
 
-You need [Claude Code](https://docs.claude.com/en/docs/claude-code) installed. Skills are loaded by Claude Code's plugin system; nothing runs on the cluster until you ask Claude to do something there.
+You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This repo is a [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) — a catalog Claude Code can browse — and `hpc` is the [plugin](https://code.claude.com/docs/en/plugins) inside it that bundles all the skills. To use the skills, you add the marketplace once, then install the plugin from it. Nothing runs on the cluster until you ask Claude to do something there.
 
-Pick the path that matches how you use Claude Code. Plugin state is shared per-user, so installing once via any path enables `hpc` in every Claude Code session on your machine.
+Pick the path that matches how you use Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
 
-### Claude Code in VS Code or Cursor
+### Claude Code Desktop app
 
-VS Code and Cursor (Cursor is VS Code-based) have a graphical plugin manager. In the Claude Code prompt box, type:
-
-```
-/plugins
-```
-
-That opens the **Manage plugins** panel. Switch to the **Marketplaces** tab, click **Add marketplace**, and paste:
+The Desktop app has a graphical plugin browser. In your session, click the **+** button next to the prompt box and choose **Plugins → Add plugin**. Add this marketplace:
 
 ```
 yale-som-hpc/claude-code-marketplace
 ```
 
-Then go back to the **Plugins** tab and install `hpc`. If you prefer typing, the CLI commands below also work inside the VS Code or Cursor chat box.
+Then install `hpc` from the browser. The CLI commands below also work — type them straight into the prompt box. See the [Desktop plugins docs](https://code.claude.com/docs/en/desktop#install-plugins) for the full UI walkthrough. Don't have the app yet? [Download Claude Desktop](https://claude.com/download).
 
-### Claude Code Desktop app
+### Claude Code in VS Code or Cursor
 
-The Desktop app does not have a graphical plugin manager. Open any terminal and use the CLI install path below. Once installed, the plugin shows up in the Desktop app automatically.
+In the Claude Code prompt box, type:
+
+```
+/plugin
+```
+
+That opens the plugin manager. Go to the **Marketplaces** tab, click **Add marketplace**, and paste:
+
+```
+yale-som-hpc/claude-code-marketplace
+```
+
+Then switch to the **Discover** tab and install `hpc`. If you prefer typing, the CLI commands below work inside the chat box too.
 
 ### Claude Code CLI (terminal)
 
@@ -66,15 +72,15 @@ Inside Claude Code:
 /plugin install hpc@yale-som-hpc
 ```
 
-Update later with `/plugin marketplace update yale-som-hpc`.
+Update later with `/plugin marketplace update yale-som-hpc`. The full command list is in the [plugins reference](https://code.claude.com/docs/en/plugins-reference).
 
 ### Claude Code on the web (claude.ai/code)
 
-The web app does not have a marketplace UI. Use the **per-project** install below; the web app picks up `.claude/settings.json` from any repo it opens.
+Plugins don't currently run in cloud sessions, which is what the web app uses. Install via one of the local paths above. If you also want collaborators on a specific repo to get the plugin automatically, use the per-project setup below.
 
 ### Per-project (committed to a repo)
 
-If you want the skills available only inside a specific repo, or you want every collaborator on a project to get them automatically, commit the marketplace reference into the repo. Add a `.claude/settings.json` like:
+If you want every collaborator on a project to get the plugin automatically, commit the marketplace reference into the repo. Add a `.claude/settings.json` like:
 
 ```json
 {
@@ -92,7 +98,7 @@ If you want the skills available only inside a specific repo, or you want every 
 }
 ```
 
-Commit `.claude/settings.json`. Anyone who runs Claude Code in the project — CLI, VS Code, Cursor, web — will have the `hpc` plugin enabled automatically the first time they trust the marketplace.
+Anyone who opens the project in a local Claude Code session (Desktop, VS Code, Cursor, CLI) will be prompted to install the marketplace and plugin the first time they trust the folder. See [Configure team marketplaces](https://code.claude.com/docs/en/discover-plugins#configure-team-marketplaces) for the full reference.
 
 ### Verify
 
