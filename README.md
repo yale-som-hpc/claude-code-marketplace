@@ -6,10 +6,10 @@
 
 This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin marketplace of skills for the Yale SOM HPC cluster (`hpc.som.yale.edu`). Install it into Claude Code to help you get work done on the HPC — write great code, submit jobs, request a GPU, set up a project, query WRDS, diagnose problems, etc.
 
-The skills were developed with two goals in mind.
+The skills were developed with two virtues in mind.
 
-1. **Be skillful.** Get your research done swiftly, beautifully, and correctly.
-2. **Be polite.** The HPC is a shared resource. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
+1. **Skillfulness.** Get your research done swiftly, beautifully, and correctly.
+2. **Citizenship.** The HPC is a shared resource. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
 
 ## What's in the `hpc` plugin
 
