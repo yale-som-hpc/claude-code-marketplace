@@ -7,7 +7,7 @@ related:
   - acquiring-data
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-05-06
+updated: 2026-05-15
 ---
 # Using the Filesystem
 
@@ -65,7 +65,7 @@ results/task_0001.parquet
 results/task_0002.parquet
 ```
 
-For append-friendly logs or scraper outputs, use compressed JSON Lines rather than thousands of files:
+For append-friendly logs or scraper outputs, use compressed JSON Lines rather than thousands of files. Use one writer per file; for Slurm arrays, write one JSONL file per task and combine later.
 
 ```python
 import gzip

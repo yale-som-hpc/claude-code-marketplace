@@ -7,7 +7,7 @@ related:
   - running-python
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-05-06
+updated: 2026-05-15
 ---
 # Acquiring Data
 
@@ -120,6 +120,8 @@ Use this for paid APIs, web pages, embeddings, LLM calls, and slow endpoints.
 ```python
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 
 CACHE_DIR = Path("/gpfs/project/myproject/cache/api")
@@ -136,11 +138,14 @@ def cached_call(payload: dict):
 
     response = call_expensive_api(payload)
 
-    tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(response))
-    tmp.rename(path)
+    fd, tmp_name = tempfile.mkstemp(prefix=path.name, suffix=".tmp", dir=path.parent)
+    with os.fdopen(fd, "w") as f:
+        json.dump(response, f)
+    os.replace(tmp_name, path)
     return response
 ```
+
+For highly parallel jobs, avoid having many workers discover the same missing cache key at once. Precompute the shared cache in one job, or guard writes with a lock, so duplicate workers do not all pay for the same request.
 
 ## Rate limits and retries
 

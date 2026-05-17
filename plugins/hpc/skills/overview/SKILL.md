@@ -8,7 +8,7 @@ related:
   - using-the-filesystem
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-04-28
+updated: 2026-05-15
 ---
 # Overview
 
@@ -59,7 +59,7 @@ Everything in these skills supports one of two virtues:
 - Do not run heavy compute on login nodes — they belong to everyone.
 - Do not hold a GPU you are not actively using. Cancel idle interactive GPU sessions immediately.
 - Do not write thousands of tiny files. GPFS metadata is shared; storms slow down every user's `ls` and job startup.
-- Do not aggressive-scrape from the cluster. All jobs share one outbound IP; one user gets everyone blocked.
+- Do not scrape aggressively from the cluster. All jobs share one outbound IP; one user gets everyone blocked.
 - Throttle job arrays (e.g. `%50`). Leave room at the table.
 - Clean up scratch when work is done.
 

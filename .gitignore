@@ -1,9 +1,10 @@
-.agent-sync
-.agents
+.agent-sync/
+.agents/
 tmp/
 __pycache__/
 *.pyc
 .env
 .venv/
-.claude/settings.local.json
+.claude/
+.pi/
 .DS_Store

@@ -6,7 +6,7 @@ related:
   - managing-jobs
   - using-the-filesystem
   - working-with-large-data
-updated: 2026-04-29
+updated: 2026-05-15
 ---
 # Running R
 
@@ -16,7 +16,7 @@ Rule: load R explicitly, restore packages deliberately, and never let package in
 
 Slightly opinionated picks for new R projects on the cluster:
 
-- **`rig`** for managing R versions across projects. The cluster module gives you one R; `rig` lets you pin per-project.
+- **Cluster R module** for the R executable. Load it explicitly in every job script with `module load r`.
 - **`renv`** for project libraries. `renv.lock` is the R analogue of `uv.lock` — it is what makes runs reproducible from login node to compute node.
 - **`pak`** as the installer behind `renv` for fast parallel installs.
 - **`lintr`** + **`styler`** for static checks and formatting; **`testthat`** for tests. Install once at project setup.
@@ -43,7 +43,7 @@ module load r
 R --version
 ```
 
-Do this in job scripts too. Do not assume `R` is in the default PATH.
+Do this in job scripts too. Do not assume `R` is in the default PATH. Do not use `rig` or `mise` as the default R installer on this cluster: R versions are provided by Lmod modules, and user jobs should build reproducibility with `renv` on top of the loaded module.
 
 ## Use renv carefully
 
@@ -180,7 +180,6 @@ Install/restore once, then run many jobs.
 ## Further reading
 
 - [renv documentation](https://rstudio.github.io/renv/) — `init`, `snapshot`, `restore`, project libraries.
-- [rig](https://github.com/r-lib/rig) — R version manager.
 - [pak](https://pak.r-lib.org/) — fast parallel package installer.
 - [tidyverse style guide](https://style.tidyverse.org/) — the conventions named above, in depth.
 - [data.table reference](https://rdatatable.gitlab.io/data.table/) — `setDTthreads`, `fread`, `:=`, joins.
