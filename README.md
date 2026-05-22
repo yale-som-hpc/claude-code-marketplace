@@ -4,7 +4,7 @@
 
 </div>
 
-This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin marketplace of skills for the Yale SOM HPC cluster (`hpc.som.yale.edu`). Install it into Claude Code to help you get work done on the HPC — write great code, submit jobs, request a GPU, set up a project, query WRDS, diagnose problems, etc.
+This repo is a [Claude Code](https://code.claude.com/docs/en/overview) plugin marketplace of skills for Yale SOM research computing, centered on the Yale SOM HPC cluster (`hpc.som.yale.edu`) and covering general coding practices that help SOM scholars produce reproducible research. Install it into Claude Code to help write code, submit jobs, request GPUs, set up projects, query WRDS, review changes, and diagnose problems.
 
 The skills were developed with two virtues in mind.
 
@@ -22,6 +22,10 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | [connecting-securely](plugins/hpc/skills/connecting-securely/SKILL.md) | SSH keys, config, agents, Jupyter tunnels. |
 | [starting-a-new-project](plugins/hpc/skills/starting-a-new-project/SKILL.md) | Reproducible project layout. |
 | [installing-software](plugins/hpc/skills/installing-software/SKILL.md) | Modules, uv, static binaries, Apptainer. |
+| [using-git-and-github](plugins/hpc/skills/using-git-and-github/SKILL.md) | Agent git behavior for researchers: commits, branches, big-file pushback. |
+| [code-overview](plugins/hpc/skills/code-overview/SKILL.md) | Five-minute orientation inside an unfamiliar research repo. |
+| [code-review](plugins/hpc/skills/code-review/SKILL.md) | Review for paths, data, seeds, lockfiles, cluster mistakes. |
+| [programming-and-coding](plugins/hpc/skills/programming-and-coding/SKILL.md) | Cross-language research coding rules. |
 
 ### Run jobs
 
@@ -30,9 +34,11 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | [managing-jobs](plugins/hpc/skills/managing-jobs/SKILL.md) | sbatch, arrays, dependencies, right-sizing loop. |
 | [using-gpus](plugins/hpc/skills/using-gpus/SKILL.md) | When to request GPUs and how to verify they're used. |
 | [using-the-filesystem](plugins/hpc/skills/using-the-filesystem/SKILL.md) | GPFS, project space, scratch, atomic writes. |
+| [coding-in-python](plugins/hpc/skills/coding-in-python/SKILL.md) | General Python: uv, ruff, pathlib, scripts, logging, seeds. |
 | [running-python](plugins/hpc/skills/running-python/SKILL.md) | uv, Slurm, thread control, resumable tasks. |
 | [parallel-python](plugins/hpc/skills/parallel-python/SKILL.md) | Worker sizing, spawn-vs-fork, nested-parallelism warning. |
 | [accelerating-python](plugins/hpc/skills/accelerating-python/SKILL.md) | DuckDB, Polars, Numba, when to add parallelism. |
+| [coding-in-r](plugins/hpc/skills/coding-in-r/SKILL.md) | General R: renv, tidyverse/data.table, here, style, CLI scripts, seeds. |
 | [running-r](plugins/hpc/skills/running-r/SKILL.md) | renv, Rscript Slurm jobs, BLAS thread control. |
 | [running-stata](plugins/hpc/skills/running-stata/SKILL.md) | Batch do-files, scratch temp, license courtesy. |
 
@@ -48,6 +54,7 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | Skill | Purpose |
 |---|---|
 | [self-diagnosing-resource-use](plugins/hpc/skills/self-diagnosing-resource-use/SKILL.md) | sacct, seff, post-job right-sizing. |
+| [justfile](plugins/hpc/skills/justfile/SKILL.md) | Justfile syntax, when to prefer just vs make vs shell scripts. |
 
 ## Install
 
@@ -165,7 +172,7 @@ You don't need to propose a fix. A clear "this happened, I expected this, instea
 Every skill should:
 
 - Have YAML frontmatter: `name`, `description`, `related`, `updated`.
-- Have a `description` that gates on Yale SOM HPC cluster context, with a `TRIGGER when ...` clause naming concrete cluster signals (Slurm, GPFS, sbatch, login node, etc.). This stops the skill from auto-firing on someone's laptop.
+- Have a `description` with a `TRIGGER when ...` clause naming concrete signals (file extensions, tools, Slurm, GPFS, sbatch, git, etc.). Cluster-specific skills should gate on Yale SOM HPC context; general coding skills may fire on laptops too.
 - Be directive and agent-usable: rules, not essay prose.
 - Include copy-paste code examples with language-tagged fences.
 - Cross-link related skills with relative paths.
@@ -176,7 +183,8 @@ Every skill should:
 
 ### What does not belong in these skills
 
-- Generic Python/R/Stata style or framework tutorials. If a rule applies on a laptop the same way it applies on the cluster, it does not belong here.
+- Domain packages unrelated to SOM research computing, or tools not useful to SOM scholars.
+- Agent-operator internals that users should not need to know.
 - Yale-specific operational policy that changes (which mailing list to email, who the current admin is, how to request an account). Link to the policy page instead.
 - Long narrative explanations. Agents work best from short directive rules with a clear "why" sentence.
 

@@ -2,6 +2,9 @@
 name: running-r
 description: Run R on the Yale SOM HPC cluster with Lmod modules, renv, batch scripts, and BLAS/OpenMP thread control. TRIGGER when writing R Slurm jobs on the Yale SOM HPC cluster, using renv on the cluster, installing R packages on the cluster, or running Rscript in batch mode there.
 related:
+  - coding-in-r
+  - programming-and-coding
+  - code-review
   - installing-software
   - managing-jobs
   - using-the-filesystem

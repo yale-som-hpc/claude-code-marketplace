@@ -2,6 +2,9 @@
 name: running-python
 description: Run Python on the Yale SOM HPC cluster with uv, Slurm, thread control, logging, and resumable outputs. TRIGGER when writing Python sbatch scripts for the Yale SOM HPC cluster, creating uv environments under /gpfs, or debugging Python Slurm jobs on the cluster.
 related:
+  - coding-in-python
+  - programming-and-coding
+  - code-review
   - installing-software
   - managing-jobs
   - parallel-python
