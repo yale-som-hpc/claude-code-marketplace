@@ -1,49 +1,87 @@
 ---
 name: using-git-and-github
-description: Git and GitHub guidance for AI agents helping researchers — commit useful checkpoints, avoid raw data and secrets, handle branches/PRs pragmatically, and keep repos reproducible. TRIGGER when running git or gh, creating commits, deciding what to track or ignore, opening PRs, creating repos, or helping a Yale SOM researcher use version control.
+description: Git and GitHub guidance. TRIGGER when running git or gh, creating commits, deciding what to track or ignore, opening PRs, creating repos.
 related:
   - programming-and-coding
   - code-review
   - coding-in-python
   - coding-in-r
   - starting-a-new-project
+  - installing-software
+  - connecting-securely
 updated: 2026-05-22
 ---
 # Using Git and GitHub
 
-This skill is for agents helping researchers who want version-control benefits without becoming git experts.
+For agents helping researchers get version-control benefits without becoming git experts.
 
-## First principles
+## Rules
 
-- Git tracks code, configuration, metadata, small examples, and reproducibility contracts.
-- Git does **not** track raw data, secrets, virtual environments, package libraries, or large generated outputs.
-- Commit logical checkpoints. Researchers should be able to recover yesterday's working analysis.
-- Prefer simple history. No force-push on shared branches unless the user explicitly understands the risk.
-- Explain git decisions in plain language.
+- Track code, config, metadata, docs, lockfiles, small examples.
+- Do not track raw data, secrets, env dirs, package libraries, large generated outputs.
+- Commit logical checkpoints.
+- Prefer simple history. No force-push on shared branches unless explicitly approved.
+- Explain git decisions plainly.
+
+## Git on HPC
+
+Git may require a module:
+
+```bash
+module load git
+git --version
+```
+
+Use `module load git` in setup notes/scripts that need git on HPC.
+
+## Auth and pushing
+
+Laptop: HTTPS with `gh auth login` or normal SSH keys are fine.
+
+HPC: prefer SSH agent forwarding so private keys stay on the laptop:
+
+```bash
+ssh -A hpc
+module load git
+ssh -T git@github.com
+git push
+```
+
+If `SSH_AUTH_SOCK` is stale, fix the socket pointer. Do **not** copy private keys to the cluster. See [connecting securely](../connecting-securely/SKILL.md).
+
+HTTPS / `gh` token auth is also fine if already configured:
+
+```bash
+module load git
+gh auth status
+git push
+```
+
+Never copy `~/.ssh/id_*` private keys onto the cluster. Public keys (`*.pub`) are safe; private keys are not.
 
 ## Agent behavior
 
-- Check `git status --short` before and after edits.
-- Do not silently stage ambiguous untracked files. Report them and propose track/ignore/refuse.
-- Commit when the user asks, or when a coherent requested task is complete and the repo appears to expect agent commits. If uncertain, ask once.
-- Use clear imperative commit messages: `Add panel construction script`, `Fix Slurm memory request`, `Document WRDS cache layout`.
-- Surface the commit hash and summary.
+- Run `git status --short` before and after edits.
+- Do not silently stage ambiguous untracked files. Report and propose track/ignore/refuse.
+- Commit when asked, or when a coherent requested task is complete and repo norms expect commits. If uncertain, ask once.
+- Use imperative messages: `Add panel construction script`, `Fix Slurm memory request`.
+- Report hash + summary.
 
-## What to track
+## Track / ignore
 
-Usually track:
+Track:
 
-- source code, scripts, Slurm scripts,
-- README and project docs,
+- source, scripts, Slurm scripts,
+- README/docs,
 - `pyproject.toml`, `uv.lock`, `renv.lock`, `.Rprofile`,
-- small sample metadata / codebooks / config files,
-- tiny synthetic fixtures used for tests,
-- Makefiles and justfiles.
+- small metadata/codebooks/config,
+- tiny synthetic fixtures,
+- Makefiles/justfiles.
 
-Usually ignore:
+Ignore:
 
 ```gitignore
-# Data and generated outputs
+# Data and outputs
 data/raw/
 data/derived/
 output/
@@ -85,11 +123,11 @@ renv/staging/
 Thumbs.db
 ```
 
-Adjust per project. For example, final manuscript figures may belong in `paper/figures/`, while large rebuildable `results/` do not.
+Adjust per project. Final manuscript figures may belong in `paper/figures/`; rebuildable `results/` usually does not.
 
-## Big-file pushback
+## Big files
 
-Before committing, inspect staged sizes:
+Before committing:
 
 ```bash
 git diff --cached --name-only | while read -r f; do
@@ -97,37 +135,30 @@ git diff --cached --name-only | while read -r f; do
 done | sort -n
 ```
 
-Rules of thumb:
+Rules:
 
-- **>5 MB**: warn and ask whether it is generated/data.
-- **>50 MB**: refuse unless the user gives a strong reason and the repo policy allows it.
-- Never suggest Git LFS as a reflex. For research data, a documented filesystem path, archive DOI, or object store is often better.
+- >5 MB: warn and ask.
+- >50 MB: refuse unless strong reason and repo policy allow it.
+- Do not suggest Git LFS reflexively. Prefer documented filesystem path, DOI, or object store.
 
-Track a `data.yml` or `DATA.md` describing where large data live:
+Track a pointer file instead:
 
 ```yaml
 - name: crsp_panel.parquet
   location: /gpfs/project/myproject/data/derived/crsp_panel.parquet
   size_bytes: 1234567890
-  description: Rebuildable CRSP monthly panel created by scripts/build_panel.py
+  description: Rebuildable panel from scripts/build_panel.py
 ```
 
-## Branches and PRs
+## Branches
 
 Default for solo/small research repos: commit on `main`.
 
-Use a branch when:
+Use a branch when multiple people are active, the change is experimental, the user asks, or review matters.
 
-- multiple people actively commit to the repo,
-- the change is experimental,
-- the user asks for a PR,
-- the change is large enough that review matters.
-
-Never force-push a branch others may use. Prefer a revert commit.
+Never force-push a shared branch. Prefer revert commits.
 
 ## GitHub CLI
-
-If `gh` is available:
 
 ```bash
 gh auth status
@@ -135,18 +166,19 @@ gh repo view --web
 gh pr create --fill
 ```
 
-If not installed on the HPC, do not block the research task. Git over HTTPS/SSH and the web UI are fine. See [installing software](../installing-software/SKILL.md) for user-installed tools.
+If `gh` is missing on HPC, do not block. Use git + web UI.
 
-## Checklist before commit
+## Checklist
 
+- [ ] `module load git` used on HPC if needed
 - [ ] `git status --short` reviewed
-- [ ] No raw data, secrets, env dirs, or large generated files staged
-- [ ] Lockfiles updated when dependencies changed
-- [ ] Relevant smoke test/check run when practical
-- [ ] Commit message plain and specific
+- [ ] No raw data, secrets, env dirs, or large outputs staged
+- [ ] Lockfiles updated if deps changed
+- [ ] Smoke test/check run if practical
+- [ ] Plain specific commit message
+- [ ] No private SSH keys copied to HPC
 
 ## Further reading
 
 - [Pro Git](https://git-scm.com/book/en/v2)
 - [GitHub CLI manual](https://cli.github.com/manual/)
-- [GitHub docs: ignoring files](https://docs.github.com/en/get-started/git-basics/ignoring-files)

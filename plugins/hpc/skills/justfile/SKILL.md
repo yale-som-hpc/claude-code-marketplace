@@ -1,6 +1,6 @@
 ---
 name: justfile
-description: Justfile syntax and task-runner guidance for research projects — when to use just vs make or shell scripts, common recipes, variables, parameters, and safe defaults. TRIGGER when writing, editing, or debugging a justfile; migrating repeated commands into task recipes; or discussing whether to use just, make, or shell scripts in a Yale SOM research project.
+description: Justfile syntax and task-runner guidance. TRIGGER when writing, editing, or debugging a justfile or choosing just vs make vs shell scripts.
 related:
   - starting-a-new-project
   - coding-in-python
@@ -10,15 +10,15 @@ updated: 2026-05-22
 ---
 # Justfile
 
-`just` is a pleasant command runner. It is **not installed by default on the SOM HPC cluster**. Use it when the project can install user tools or when collaborators already have it. Use `make` or plain shell scripts when zero extra tooling matters.
+`just` is a nice command runner. It is **not installed by default on SOM HPC**.
 
-## When to use what
+## Choose
 
-- **Shell script**: one task, mostly bash, should run everywhere.
-- **Makefile**: maximum availability; `make` exists on most systems including HPC.
-- **Justfile**: nicer syntax, good help text, good parameter handling; requires installing `just`.
+- Shell script: one task, no extra tool.
+- Makefile: maximum availability; `make` exists on HPC.
+- Justfile: nicer syntax/help/params; requires installing `just`.
 
-If you choose `just` on HPC, install it as a user binary in `~/.local/bin` or project `bin/`; see [installing software](../installing-software/SKILL.md). Do not require `just` for a critical cluster workflow unless setup docs say how to install it.
+If `just` is critical, document install or provide Make/shell fallback. See [installing software](../installing-software/SKILL.md).
 
 ## Boilerplate
 
@@ -41,11 +41,7 @@ threads := env_var_or_default("SLURM_CPUS_PER_TASK", "1")
 ## Recipes
 
 ```just
-# Show available tasks
-default:
-    @just --list
-
-# Format Python code
+# Format Python
 fmt:
     uv run ruff format .
 
@@ -53,7 +49,7 @@ fmt:
 test:
     uv run pytest
 
-# Build one output
+# Build panel
 build-panel:
     .venv/bin/python scripts/build_panel.py \
       --input data/raw/panel.csv \
@@ -73,9 +69,9 @@ args *ARGS:
     .venv/bin/python scripts/main.py {{ARGS}}
 ```
 
-## Slurm wrappers
+## Slurm
 
-Keep Slurm resource requests in `slurm/*.sbatch`; let `just` submit them.
+Keep resource requests in `slurm/*.sbatch`; let `just` submit them.
 
 ```just
 submit:
@@ -85,9 +81,9 @@ queue:
     squeue --me
 ```
 
-Do not hide important resource requests inside a justfile command where collaborators cannot find them.
+Do not hide important Slurm resources inside recipes.
 
-## Shebang recipes
+## Shebang recipe
 
 ```just
 clean-logs:
@@ -96,9 +92,7 @@ clean-logs:
     find logs -type f -name '*.out' -mtime +30 -print -delete
 ```
 
-## Makefile fallback
-
-If `just` is not available, this is often enough:
+## Make fallback
 
 ```make
 .PHONY: help fmt test submit
@@ -117,13 +111,12 @@ submit:
 
 ## Checklist
 
-- [ ] `just --list` shows useful recipe descriptions
-- [ ] Critical Slurm resources live in `slurm/*.sbatch`, not hidden recipes
-- [ ] README says how to install `just`, or Makefile/shell fallback exists
-- [ ] Recipes use project lockfiles/environments, not global state
+- [ ] `just --list` useful
+- [ ] Slurm resources live in `slurm/*.sbatch`
+- [ ] README says how to install `just`, or fallback exists
+- [ ] Recipes use project env/lockfiles, not global state
 
 ## Further reading
 
 - [just manual](https://just.systems/man/en/)
-- [just README](https://github.com/casey/just)
 - [GNU Make manual](https://www.gnu.org/software/make/manual/make.html)
