@@ -9,17 +9,17 @@ related:
   - self-diagnosing-resource-use
   - using-the-filesystem
   - acquiring-data
-updated: 2026-04-29
+updated: 2026-05-31
 ---
 # Using GPUs
 
 Rule: hold a GPU only while GPU code is actively running. Do CPU preprocessing, downloads, tokenization, and web/API calls elsewhere.
 
-GPUs are the scarcest resource on the cluster. An idle interactive GPU session — `srun --pty bash` left open while you go to lunch — is blocking another user's job right now. Cancel it. The H100 node has 4 GPUs total for the whole cluster; treat it accordingly.
+GPUs are the scarcest resource on the cluster. An idle interactive GPU session — `srun --pty bash` left open while you go to lunch — is blocking another user's job right now. Cancel it. The H100 partition now has two 4-GPU nodes when healthy, but it remains the scarcest partition; treat it accordingly.
 
 ## Account for every GPU-hour
 
-Treat each requested GPU-hour as compute somebody else cannot use. The cluster has finite GPUs, the H100 partition has only four cards total (soon eight), and per-user GPU caps are likely to be enforced before any other resource. The way to stay ahead of that is to cancel idle GPU jobs the instant you notice them — `scancel JOBID` — and never request more GPUs than your code uses.
+Treat each requested GPU-hour as compute somebody else cannot use. The cluster has finite GPUs, H100s are still scarce, and per-user GPU caps are likely to be enforced before any other resource. The way to stay ahead of that is to cancel idle GPU jobs the instant you notice them — `scancel JOBID` — and never request more GPUs than your code uses.
 
 ## Do you need a GPU?
 
@@ -62,6 +62,13 @@ srun .venv/bin/python train.py
 ```
 
 Only request multiple GPUs if the code explicitly uses multiple GPUs.
+
+Use `gpunormal` by default. Use `h100` only when H100 performance or 80 GB VRAM specifically matters:
+
+```bash
+#SBATCH --partition=h100
+#SBATCH --gres=gpu:h100:1
+```
 
 Want to develop locally too? `train.py` itself should not assume Slurm — write it so `python train.py` (no `srun`, no `nvidia-smi`) works on your laptop's CPU. Use `torch.cuda.is_available()` to branch on device, and read `${SLURM_CPUS_PER_TASK:-N}` style fallbacks for thread counts. The Slurm script is the cluster-only wrapper; the Python should be portable.
 
@@ -133,6 +140,7 @@ Check partitions and GPU types before requesting a specific GPU:
 ```bash
 sinfo -o "%P %N %G %c %m"
 sinfo --Format="partition,nodelist,gres,cpus,memory"
+sinfo -N -p h100 -o "%N %G %t"
 ```
 
 Inside a GPU allocation, check the actual card and VRAM:
@@ -145,7 +153,7 @@ Current rough guide:
 
 - RTX 8000 / A40: 48 GB nominal; `nvidia-smi` reports ~46 GB usable on RTX 8000.
 - A100: 40 GB or 80 GB VRAM depending on node. Each `gpunormal` A100 node holds 3 GPUs.
-- H100: 80 GB VRAM, scarcest partition. The single `h100` node holds 4 GPUs.
+- H100: 80 GB VRAM, scarcest partition. H100 nodes hold 4 GPUs each; as of 2026-05-31 the partition has two H100 nodes / 8 cards when healthy. Check `sinfo -N -p h100` for drained or invalid nodes before submitting.
 
 The driver on GPU nodes currently supports the CUDA 12.8 runtime, so PyTorch/JAX wheels with bundled CUDA generally work without `module load cuda`.
 

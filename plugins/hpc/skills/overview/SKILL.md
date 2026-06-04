@@ -8,7 +8,7 @@ related:
   - using-the-filesystem
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-05-15
+updated: 2026-05-31
 ---
 # Overview
 
@@ -26,15 +26,21 @@ Use the cluster as a shared research instrument. Your job is not just to make co
 
 ## Cluster facts agents should know
 
-Current as of 2026-04-28. Verify live details with `sinfo -s` when generating production instructions.
+Current as of 2026-05-31. Verify live details with `sinfo -s` when generating production instructions.
 
 - Scheduler: Slurm. Module system: Lmod (Spack-built; users run `module load`, never `spack`).
-- Main partitions: `default_queue` (4h max, mixed CPU/A40), `cpunormal`, `gpunormal` (RTX 8000/A100, 3 GPUs per A100 node), `h100` (one node, 4 H100s — scarcest resource on the cluster), `build`.
+- Main partitions: `default_queue` (4h max, CPU-only and A40 nodes), `cpunormal` (CPU-only), `gpunormal` (RTX 8000/A100, 3 GPUs per GPU node), `h100` (4 H100s per node; currently two H100 nodes / 8 H100s when healthy), `build` (A40 build nodes).
+- The `h100` partition is still the scarcest GPU resource. Check live state before targeting it; drained or invalid nodes are unavailable even if they appear in the partition.
 - `/gpfs/project/` for shared team projects (request via somit@yale.edu). `/gpfs/scratch60/$USER/` for scratch (clean it). Each compute node also has local `/tmp` (~20 GB NVMe), `/local` (~700 GB NVMe), and `/dev/shm` (RAM-backed, ~half the node's memory) — all per-node and *not* auto-cleaned by Slurm. See [using the filesystem](../using-the-filesystem/SKILL.md#compute-node-local-storage).
 - `$HOME` is `/home/$USER`, same as `/gpfs/home/$USER`.
 - `KillWait=30`: after final `SIGTERM`, jobs have ~30 seconds before `SIGKILL`. Too short to rely on for checkpointing.
 
-Run `sinfo -s` for live node-level detail.
+Run `sinfo -s` for live partition detail. For node/GPU detail:
+
+```bash
+sinfo -N -o "%N %P %G %c %m %t"
+sinfo -N -p h100 -o "%N %G %t"
+```
 
 ## Which skill to use
 
