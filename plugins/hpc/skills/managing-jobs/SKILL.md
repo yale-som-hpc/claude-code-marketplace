@@ -1,6 +1,6 @@
 ---
 name: managing-jobs
-description: Submit, monitor, cancel, array, and chain Slurm jobs on the Yale SOM HPC cluster. TRIGGER when writing sbatch scripts for the Yale SOM HPC cluster, choosing cluster partitions/resources, using job arrays or dependencies on the cluster, or running sacct/squeue/scancel against cluster jobs.
+description: Submit, monitor, cancel, array, and chain Slurm jobs on the Yale SOM HPC cluster. TRIGGER when running, submitting, or scheduling any job, script, or analysis on the Yale SOM HPC cluster (even phrased plainly, e.g. "run my regression on the cluster"), writing sbatch scripts, choosing cluster partitions/resources, using job arrays or dependencies, or running sacct/squeue/scancel against cluster jobs.
 related:
   - overview
   - self-diagnosing-resource-use
@@ -170,6 +170,10 @@ sbatch slurm/test.sh
 squeue -u $USER
 sacct -j JOBID --format=JobID,Elapsed,MaxRSS,AllocCPUS,TotalCPU,State
 ```
+
+## Report back without being asked
+
+When a real job finishes, do not stop at "it ran." Proactively run `seff JOBID` and tell the user, in plain language, whether the job used what it asked for — e.g. "it used 6 GB of the 64 GB requested and 1 of 4 CPUs, so next time request `--mem=12G --cpus-per-task=1`." Most researchers will not think to ask; surfacing waste is part of the job, not an extra. See [self-diagnosing resource use](../self-diagnosing-resource-use/SKILL.md).
 
 ## Checklist
 

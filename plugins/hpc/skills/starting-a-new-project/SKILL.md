@@ -12,7 +12,7 @@ related:
   - running-r
   - using-the-filesystem
   - acquiring-data
-updated: 2026-04-28
+updated: 2026-06-05
 ---
 # Starting a New Project
 
@@ -24,6 +24,7 @@ Rule: make the project understandable to a new RA and restartable by a future yo
 /gpfs/project/myproject/
 ├── code/                 # Git repo
 │   ├── README.md
+│   ├── CLAUDE.md
 │   ├── pyproject.toml
 │   ├── uv.lock
 │   ├── renv.lock
@@ -78,6 +79,28 @@ Track code, lockfiles, and documentation. Do not track data, credentials, enviro
 - `data/derived/`: rebuildable from raw data and code.
 ```
 
+## Seed a `CLAUDE.md`
+
+Drop a short `CLAUDE.md` in the repo root so the project's cluster norms persist across sessions — Claude Code reads it automatically at the start of every session, and so does a future RA. Keep it to the project's specifics; the installed skills already carry the general rules.
+
+```markdown
+# Project notes
+
+- This project runs on the Yale SOM HPC cluster. Follow the `hpc` skills.
+- Project root: `/gpfs/project/myproject`. Raw data in `data/raw/` is read-only.
+- Run analysis on compute nodes via `sbatch slurm/*.sh`, never on the login node.
+- Python env is managed with uv; build it once with `uv sync --frozen`, don't `uv sync` inside jobs.
+- After a real job, run `seff` and report whether it was right-sized.
+```
+
+Claude Code reads `CLAUDE.md`, **not** `AGENTS.md`. If collaborators also use other agents (Codex, Cursor) that read `AGENTS.md`, keep the shared notes in `AGENTS.md` and make `CLAUDE.md` a one-line pointer to it. Claude Code expands the `@` import at load, so this pulls the whole file in:
+
+```markdown
+Read @AGENTS.md for this project's context.
+```
+
+(A symlink — `ln -s AGENTS.md CLAUDE.md` — works too if you don't need any Claude-only lines.)
+
 ## Add a thin Justfile
 
 Use `just` to document common commands without hiding what they do.
@@ -123,6 +146,7 @@ Do not lock `data/raw/` before collaborators have finished placing the initial f
 - [ ] Environments are reproducible from lockfiles.
 - [ ] Logs go to `logs/`.
 - [ ] Justfile or README documents the common commands.
+- [ ] `CLAUDE.md` records the project's cluster norms (Claude Code reads it, not `AGENTS.md`).
 - [ ] First Slurm test job passes before any full run.
 
 ## Further reading

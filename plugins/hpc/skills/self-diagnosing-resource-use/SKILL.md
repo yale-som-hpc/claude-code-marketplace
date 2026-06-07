@@ -1,6 +1,6 @@
 ---
 name: self-diagnosing-resource-use
-description: Diagnose whether a Yale SOM HPC cluster Slurm job used its requested CPUs, memory, GPUs, and time wisely, then right-size the next request. TRIGGER when a Slurm job on the Yale SOM HPC cluster is slow/killed/pending/idle/over-requested or needs post-run resource diagnosis.
+description: Diagnose whether a Yale SOM HPC cluster Slurm job used its requested CPUs, memory, GPUs, and time wisely, then right-size the next request. TRIGGER when a Slurm job on the Yale SOM HPC cluster is slow, killed, pending, idle, over-requested, ran out of memory, or failed, or whenever a job just finished and should be checked for waste.
 related:
   - managing-jobs
   - using-gpus
@@ -11,7 +11,7 @@ updated: 2026-04-28
 ---
 # Self-Diagnosing Resource Use
 
-Rule: after every serious job, check what you actually used and right-size the next job.
+Rule: after every serious job, check what you actually used and right-size the next job. Do this on your own initiative and report the result in plain language — the user is usually a researcher who will not think to ask "was that wasteful?" Translate the numbers ("used 6 of 64 GB; drop `--mem` to 12G next time"), don't just paste `seff` output.
 
 ## Completed job accounting
 

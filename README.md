@@ -20,6 +20,7 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | Skill | Purpose |
 |---|---|
 | [connecting-securely](plugins/hpc/skills/connecting-securely/SKILL.md) | SSH keys, config, agents, Jupyter tunnels. |
+| [staying-connected](plugins/hpc/skills/staying-connected/SKILL.md) | Durable sessions (tmux/zmx) and where Claude Code itself runs. |
 | [starting-a-new-project](plugins/hpc/skills/starting-a-new-project/SKILL.md) | Reproducible project layout. |
 | [installing-software](plugins/hpc/skills/installing-software/SKILL.md) | Modules, uv, static binaries, Apptainer. |
 | [using-git-and-github](plugins/hpc/skills/using-git-and-github/SKILL.md) | Agent git behavior for researchers: commits, branches, big-file pushback. |
@@ -56,6 +57,16 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | [self-diagnosing-resource-use](plugins/hpc/skills/self-diagnosing-resource-use/SKILL.md) | sacct, seff, post-job right-sizing. |
 | [justfile](plugins/hpc/skills/justfile/SKILL.md) | Justfile syntax, when to prefer just vs make vs shell scripts. |
 
+## Commands
+
+The plugin also ships a few slash commands as a typeable front door, so you don't have to phrase a request just right for the matching skill to load:
+
+| Command | Does |
+|---|---|
+| `/hpc-checkup [JOBID]` | Checks whether your recent jobs were right-sized and tells you what to request next time. |
+| `/hpc-new-project [name]` | Scaffolds a reproducible project (layout, lockfiles, `CLAUDE.md`, first test job). |
+| `/hpc-connect` | Sets up a durable connection that survives laptop sleep / wifi drops. |
+
 ## Install
 
 You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This repo is a [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) — a catalog Claude Code can browse — and `hpc` is the [plugin](https://code.claude.com/docs/en/plugins) inside it that bundles all the skills. To use the skills, you add the marketplace once, then install the plugin from it. Nothing runs on the cluster until you ask Claude to do something there.
@@ -71,13 +82,17 @@ If you'd rather use a GUI, pick the surface below that matches how you use Claud
 
 ### Claude Code Desktop app
 
-The Desktop app has a graphical plugin browser. In your session, click the **+** button next to the prompt box and choose **Plugins → Add plugin**. Add this marketplace:
+The Desktop app adds marketplaces through the **Customize** menu — *not* the **+** button next to the prompt box (that one only installs plugins from marketplaces you have already added).
 
-```
-yale-som-hpc/claude-code-marketplace
-```
+1. In the left sidebar, click **Customize** → the **Plugins** tab.
+2. Under **Personal plugins**, click **+** → **Add marketplace** → **Add from a repository**.
+3. Enter the repository (a GitHub repo or git URL):
+   ```
+   yale-som-hpc/claude-code-marketplace
+   ```
+4. Back in the **Plugins** tab, click **Browse plugins**, find `hpc`, and click **Install**. Make sure it is **enabled**.
 
-Then install `hpc` from the browser. The CLI commands below also work — type them straight into the prompt box. See the [Desktop plugins docs](https://code.claude.com/docs/en/desktop#install-plugins) for the full UI walkthrough. Don't have the app yet? [Download Claude Desktop](https://claude.com/download).
+See the [Desktop plugins docs](https://code.claude.com/docs/en/desktop#install-plugins) for the full UI walkthrough. Don't have the app yet? [Download Claude Desktop](https://claude.com/download).
 
 ### Claude Code in VS Code or Cursor
 
@@ -140,6 +155,7 @@ Inside Claude Code, run `/plugin`. You should see `hpc@yale-som-hpc` listed and 
 plugins/hpc/
 ├── .claude-plugin/
 │   └── plugin.json           # plugin manifest (bump version on release)
+├── commands/<name>.md        # one file per slash command
 └── skills/<name>/SKILL.md    # one directory per skill
 ```
 

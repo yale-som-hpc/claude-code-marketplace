@@ -3,10 +3,11 @@ name: connecting-securely
 description: Connect to the Yale SOM HPC cluster (hpc.som.yale.edu) over SSH with keys, agents, jump hosts, and tunnels — no copied private keys. TRIGGER when SSHing to the Yale SOM HPC cluster, setting up VS Code/Jupyter tunnels to a cluster compute node, forwarding ports through the cluster login node, or troubleshooting cluster SSH/agent auth.
 related:
   - overview
+  - staying-connected
   - managing-jobs
   - installing-software
   - using-gpus
-updated: 2026-04-28
+updated: 2026-06-05
 ---
 # Connecting Securely
 
@@ -37,12 +38,19 @@ Example `~/.ssh/config` on your laptop:
 Host hpc
     HostName hpc.som.yale.edu
     User yournetid
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 10m
 
 Host b??? c???
     User yournetid
     ProxyJump hpc
     HostName %h.cm.cluster
 ```
+
+`ServerAliveInterval` keeps NAT/firewalls from silently dropping an idle session; `ControlMaster`/`ControlPersist` reuse one warm connection across repeated logins. To keep long agent work alive across laptop sleep or wifi drops, see [staying connected](../staying-connected/SKILL.md).
 
 Enable `ForwardAgent yes` only if you need it for Git or another SSH hop. Agent forwarding is convenient, but any process you run on the remote host can ask your agent to sign while the connection is active.
 

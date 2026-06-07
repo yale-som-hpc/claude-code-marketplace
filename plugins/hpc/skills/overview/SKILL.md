@@ -8,7 +8,8 @@ related:
   - using-the-filesystem
   - installing-software
   - self-diagnosing-resource-use
-updated: 2026-05-31
+  - staying-connected
+updated: 2026-06-05
 ---
 # Overview
 
