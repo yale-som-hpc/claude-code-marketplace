@@ -1,6 +1,6 @@
 ---
 name: staying-connected
-description: Keep work alive across dropped SSH connections to the Yale SOM HPC cluster, and decide where Claude Code itself runs (on the login node vs. on your laptop driving the cluster). TRIGGER when a cluster session dies on laptop sleep/wifi drop, when running Claude Code or a long agent session against the Yale SOM HPC cluster, when keeping tmux/zmx sessions alive on the cluster, or when a long-running shell loses its work on disconnect.
+description: Keep work alive across dropped SSH connections to the Yale SOM HPC cluster, and decide where Claude Code itself runs (login node vs. your laptop driving the cluster). TRIGGER when a cluster session dies on sleep/wifi drop, running Claude Code or a long agent against the cluster, keeping tmux/zmx sessions alive there, or a long-running shell losing its work on disconnect.
 related:
   - connecting-securely
   - overview

@@ -1,6 +1,6 @@
 ---
 name: programming-and-coding
-description: General research coding rules. TRIGGER when writing, reviewing, refactoring, or debugging code.
+description: Cross-cutting research-coding principles — reproducibility, seeds, never mutating raw data, failing loudly. TRIGGER when writing or reviewing research code and no language- or task-specific skill (coding-in-python, coding-in-r, code-review, running-*) fits.
 related:
   - coding-in-python
   - coding-in-r

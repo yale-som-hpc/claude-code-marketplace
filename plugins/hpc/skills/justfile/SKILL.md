@@ -1,6 +1,6 @@
 ---
 name: justfile
-description: Justfile syntax and task-runner guidance. TRIGGER when writing, editing, or debugging a justfile or choosing just vs make vs shell scripts.
+description: just/justfile task-runner guidance — recipes, variables, make fallback, plus SLURM_CPUS_PER_TASK vars and keeping Slurm resources in sbatch for cluster work. TRIGGER when writing, editing, or debugging a justfile, or choosing just vs make.
 related:
   - starting-a-new-project
   - coding-in-python

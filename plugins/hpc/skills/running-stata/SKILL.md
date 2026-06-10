@@ -6,17 +6,20 @@ related:
   - using-the-filesystem
   - working-with-large-data
   - self-diagnosing-resource-use
-updated: 2026-04-28
+updated: 2026-06-10
 ---
 # Running Stata
 
 Rule: run Stata in batch jobs, write logs, put temp files on scratch, and request only the cores Stata will use.
+
+What you get: the `stata` module is a complete MP install — no package-bootstrap step (unlike R, whose base module ships nothing). `ssc install` packages land in your personal ado directory.
 
 ## Slurm template
 
 ```bash
 #!/bin/bash
 #SBATCH --job-name=stata-job
+# default_queue caps at 4h; for long/large work use cpunormal or gpunormal (see managing-jobs)
 #SBATCH --partition=default_queue
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=4
@@ -28,9 +31,11 @@ set -euo pipefail
 module purge
 module load stata
 
+# These only affect external BLAS calls; native Stata/MP threading is controlled
+# by `set processors` (below), not by these. Harmless to keep for portability.
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
+# The stata/19 module defaults STATATMP=/gpfs/scratch60; override for per-job isolation:
 export STATATMP=/gpfs/scratch60/$USER/stata-tmp/${SLURM_JOB_ID}
 
 mkdir -p "$STATATMP" logs
@@ -40,11 +45,19 @@ cd /gpfs/project/myproject/code
 stata-mp -b do src/main.do
 ```
 
+Two log gotchas, both verified on the cluster:
+
+- **Read the `.log`, not the `.out`.** Under `stata-mp -b`, Stata sends all output to its own log file; the Slurm `--output` `.out` file ends up **empty**. The `log using` inside your do-file (below) is what you read.
+- **`stata-mp -b do src/main.do` also writes `main.log` in the working directory** (named after the do-file), in addition to your `log using`. Either expect/clean up that stray file or name your `log using` differently.
+- **Check the log for errors — batch mode can exit 0 on a Stata error.** Grep the `.log` for an `r(###)` return code; `set -e` will not catch a do-file error on its own.
+
 ## Do-file preamble
 
 ```stata
 capture log close _all
-log using "logs/main_${SLURM_JOB_ID}.log", replace text
+local jobid : env SLURM_JOB_ID
+if "`jobid'" == "" local jobid local
+log using "logs/main_`jobid'.log", replace text
 
 local ncpus : env SLURM_CPUS_PER_TASK
 if "`ncpus'" == "" local ncpus 1

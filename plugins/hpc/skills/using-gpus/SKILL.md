@@ -9,7 +9,7 @@ related:
   - self-diagnosing-resource-use
   - using-the-filesystem
   - acquiring-data
-updated: 2026-05-31
+updated: 2026-06-10
 ---
 # Using GPUs
 
@@ -63,7 +63,7 @@ srun .venv/bin/python train.py
 
 Only request multiple GPUs if the code explicitly uses multiple GPUs.
 
-Use `gpunormal` by default. Use `h100` only when H100 performance or 80 GB VRAM specifically matters:
+Use `gpunormal` by default. (Note: `gpunormal` is the cluster's *general* production queue on the GPU nodes, not a GPU-only partition — you get a GPU only because you asked with `--gres=gpu:1`. A job there without `--gres` runs CPU-only and consumes no GPU. See [overview](../overview/SKILL.md) for the partition map.) Use `h100` only when H100 performance or 80 GB VRAM specifically matters:
 
 ```bash
 #SBATCH --partition=h100
@@ -151,11 +151,12 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 
 Current rough guide:
 
-- RTX 8000 / A40: 48 GB nominal; `nvidia-smi` reports ~46 GB usable on RTX 8000.
-- A100: 40 GB or 80 GB VRAM depending on node. Each `gpunormal` A100 node holds 3 GPUs.
-- H100: 80 GB VRAM, scarcest partition. H100 nodes hold 4 GPUs each; as of 2026-05-31 the partition has two H100 nodes / 8 cards when healthy. Check `sinfo -N -p h100` for drained or invalid nodes before submitting.
+- RTX 8000: 48 GB nominal; `nvidia-smi` reports ~46 GB (46080 MiB) usable. On `gpunormal` nodes c001–c008.
+- A40: 48 GB nominal. **1 GPU each on the `build`/`default_queue` nodes b001–b002 — not on `gpunormal`.** Requesting an A40 on `gpunormal` will never schedule.
+- A100: comes in 40 GB and 80 GB variants on `gpunormal`, 3 per node — the higher-host-RAM nodes (~1 TB) carry the 80 GB cards, the ~512 GB nodes the 40 GB cards (verified via `nvidia-smi`; confirm in your own allocation). The 80 GB A100 nodes are the scarcer ones — don't tie them up with CPU-only work.
+- H100: 80 GB VRAM, scarcest partition. H100 nodes hold 4 GPUs each; as of 2026-06-09 the partition has two H100 nodes / 8 cards when healthy. Check `sinfo -N -p h100` for drained or invalid nodes before submitting.
 
-The driver on GPU nodes currently supports the CUDA 12.8 runtime, so PyTorch/JAX wheels with bundled CUDA generally work without `module load cuda`.
+The driver on the GPU nodes supports a recent CUDA runtime — check the `CUDA Version` shown top-right by `nvidia-smi`. PyTorch/JAX wheels with bundled CUDA generally run fine without `module load cuda`, since newer drivers are backward-compatible with older CUDA runtimes.
 
 `--gres=gpu:1` reserves one GPU on a shared node — other users' jobs may run on the same physical machine.
 
@@ -169,10 +170,10 @@ Find CUDA modules:
 module spider cuda
 ```
 
-Then load the version your project expects, for example:
+Then load the version your project expects. Bare `module load cuda` follows the moving default — pin a specific version for reproducibility (see `module spider cuda` for what's available, including the `cuda/toolkit`, `cuda/blas`, and `cuda/fft` variants):
 
 ```bash
-module load cuda
+module load cuda/<version>   # from `module spider cuda`
 nvcc --version
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: code-overview
-description: Fast repo orientation. TRIGGER when entering an unfamiliar repo, locating an analysis step, or planning a change.
+description: Quickly orient in an unfamiliar research repo — map structure, find the analysis entry point and the reproducibility contract (Slurm/uv/renv/manifests). TRIGGER when entering an unfamiliar repo, locating an analysis step, or planning a change.
 related:
   - programming-and-coding
   - coding-in-python

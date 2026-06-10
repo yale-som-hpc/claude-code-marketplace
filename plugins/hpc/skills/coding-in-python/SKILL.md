@@ -1,6 +1,6 @@
 ---
 name: coding-in-python
-description: Python implementation rules for research code — uv environments, formatting, CLI scripts, logging. TRIGGER when editing .py files or writing Python code.
+description: How to write research Python — uv environments, formatting, CLI scripts, logging. TRIGGER when authoring or editing .py files for research work. For running Python on the Yale SOM HPC cluster (sbatch, Slurm, uv on /gpfs), use running-python instead.
 related:
   - programming-and-coding
   - running-python

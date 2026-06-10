@@ -7,7 +7,7 @@ related:
   - using-the-filesystem
   - running-python
   - working-with-large-data
-updated: 2026-04-28
+updated: 2026-06-09
 ---
 # Self-Diagnosing Resource Use
 
@@ -16,14 +16,18 @@ Rule: after every serious job, check what you actually used and right-size the n
 ## Completed job accounting
 
 ```bash
-sacct -j JOBID --format=JobID,JobName,Elapsed,AllocCPUS,TotalCPU,MaxRSS,State
+sacct -j JOBID --format=JobID,JobName,Elapsed,AllocCPUS,TotalCPU,MaxRSS,State --units=G
 ```
+
+Note: `MaxRSS` is **blank on the parent job row** — it only populates on the `.batch` and step (`.0`, `.1`, …) rows. Read the `.batch` line for actual peak memory, not the summary line.
 
 For a friendlier summary:
 
 ```bash
 seff JOBID
 ```
+
+Caveat: `seff` samples coarsely and reports `CPU Utilized: 00:00:00` / `0.00%` for **sub-minute jobs** even when they did real work (verified on this cluster). Ignore the CPU-efficiency numbers on jobs shorter than ~1–2 minutes — they reflect the sampling miss, not waste. Trust them only on jobs long enough to be sampled.
 
 ## Interpret CPU use
 

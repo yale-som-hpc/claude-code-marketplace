@@ -1,6 +1,6 @@
 ---
 name: parallel-python
-description: Choose threads, processes, queues, and Slurm arrays for Python on the Yale SOM HPC cluster. TRIGGER when running multiprocessing/concurrent.futures/joblib/Dask/Ray Python work on the Yale SOM HPC cluster, writing Slurm array jobs there, or right-sizing workers to SLURM_CPUS_PER_TASK on the cluster.
+description: Choose threads, processes, queues, and Slurm arrays for Python on the Yale SOM HPC cluster. TRIGGER when running multiprocessing/concurrent.futures/joblib/Dask/Ray on the cluster, writing Slurm array jobs there, or sizing workers to SLURM_CPUS_PER_TASK.
 related:
   - running-python
   - accelerating-python
@@ -8,7 +8,7 @@ related:
   - working-with-large-data
   - acquiring-data
   - self-diagnosing-resource-use
-updated: 2026-04-29
+updated: 2026-06-09
 ---
 # Parallel Python
 
@@ -38,7 +38,10 @@ def available_workers() -> int:
     slurm = os.environ.get("SLURM_CPUS_PER_TASK")
     if slurm:
         return int(slurm)
-    return os.cpu_count() or 1
+    # cgroup-aware fallback. Do NOT use os.cpu_count(): inside a small allocation
+    # it returns the whole node (e.g. 32) — verified on this cluster — so a job
+    # with SLURM_CPUS_PER_TASK unset would oversubscribe massively.
+    return len(os.sched_getaffinity(0))
 ```
 
 If Slurm gives you 4 CPUs, do not start 32 workers. If each worker calls BLAS/NumPy, also set thread environment variables in the Slurm script.
@@ -65,11 +68,13 @@ ctx = mp.get_context("spawn")
 
 Use:
 
+- `fork` is the reliable default for CPU-bound work on this cluster when you do not use CUDA.
 - `spawn` for CUDA/PyTorch or when the parent has active threads/open handles.
-- `forkserver` as a safer general-purpose alternative to `fork`.
-- `fork` only when you understand the inherited state and do not use CUDA.
+- **Avoid `forkserver` when the job launches Python directly via `srun .venv/bin/python` — it deadlocks at worker startup** (verified on default_queue, June 2026: the job ran to its wall limit at 0% CPU, reproduced). It only works when an intervening `bash -c "… python …"` wraps Python. Use `spawn` instead when you need a clean child state.
 
 `fork` + CUDA is a common cause of mysteriously hung GPU jobs.
+
+> Any pool-creating code must run under `if __name__ == "__main__":` when the start method is `spawn` (or `forkserver`) — at module level it raises `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase`. The examples below put the driver logic under a `main()` guarded by `if __name__ == "__main__":` for this reason.
 
 ## Three rungs of parallelism
 

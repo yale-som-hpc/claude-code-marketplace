@@ -12,17 +12,19 @@ related:
   - working-with-large-data
   - using-gpus
   - acquiring-data
-updated: 2026-05-06
+updated: 2026-06-10
 ---
 # Running Python
 
 Rule: use a project environment, control threads, log clearly, and make outputs resumable.
 
+What you get: with uv you control the interpreter and every package yourself, so nothing depends on what Python happens to be preinstalled on the cluster — no bootstrap step to worry about.
+
 ## Tooling defaults
 
 **Use `uv`.** It is the package manager for cluster Python work; everything below assumes it. Don't reach for conda, mamba, poetry, pipenv, pip-tools, or `pip install --user` — uv supersedes all of them. Why specifically uv on this cluster:
 
-- **Single tool** for dependencies, lockfile, virtualenv, *and* Python interpreter — no module/conda/pyenv stack to coordinate. The system Python on Yale SOM HPC is 3.9.18; modules give you 3.11; uv downloads 3.12 / 3.13 / 3.14 on demand and pins it to your project (`pyproject.toml`'s `requires-python`).
+- **Single tool** for dependencies, lockfile, virtualenv, *and* Python interpreter — no module/conda/pyenv stack to coordinate. The cluster's system `python3` is old, and the `python` modules are a fixed set that changes between maintenance windows (check `python3 --version` and `module spider python`); uv downloads and pins whatever recent Python your project needs (`pyproject.toml`'s `requires-python`).
 - **Lockfile (`uv.lock`) is built-in** and resolves identically on the login node, compute node, and your laptop — no `conda env export` games, no "works on my machine."
 - **10–100× faster than conda on GPFS.** A `uv sync --frozen` is a few seconds; a `conda env create` is a multi-minute metadata storm because conda writes thousands of small files into one directory.
 - **Single `.venv` directory** in your project — easy to inspect, easy to nuke, easy to atomically swap.
@@ -41,7 +43,7 @@ How to install the tools themselves: see [installing software](../installing-sof
 
 ## Project setup with uv
 
-Pin a recent Python in `pyproject.toml` and let uv install it — don't depend on the cluster's system `python3` (3.9.18 as of May 2026, old enough that NumPy 2.x and many libraries are dropping support) or `module load python/3.11.x` (a single version, can change between maintenance windows):
+Pin a recent Python in `pyproject.toml` and let uv install it — don't depend on the cluster's system `python3` (old enough that NumPy 2.x and many libraries are dropping support — check `python3 --version`) or a `module load python/...` (a fixed version that can change between maintenance windows; see `module spider python`):
 
 ```bash
 cd /gpfs/project/myproject/code
@@ -50,7 +52,7 @@ uv add polars pyarrow duckdb
 uv sync --frozen
 ```
 
-`uv python list` shows what's available; `uv python install 3.13` downloads it into `~/.local/share/uv/python/` (~50 MB per version) if uv hasn't already. The pinned version is recorded as `requires-python` in `pyproject.toml`, so anyone running `uv sync` on this project gets the same interpreter. 3.13 is the right default in May 2026; drop to 3.12 if a critical dependency lags.
+`uv python list` shows what's available; `uv python install 3.13` downloads it into `~/.local/share/uv/python/` (~50 MB per version) if uv hasn't already. The pinned version is recorded as `requires-python` in `pyproject.toml`, so anyone running `uv sync` on this project gets the same interpreter. Pick a current Python (`uv python list` shows options); drop one minor version if a critical dependency lags.
 
 This is a setup-time operation, run once on a login node. Do not run `uv sync` inside Slurm jobs or job arrays — environment mutation in flight is a waste pattern (and `--frozen` makes it explicit that the lockfile is the source of truth).
 
@@ -87,6 +89,7 @@ Use this shape as the default. The launch line is `srun .venv/bin/python ...`, n
 ```bash
 #!/bin/bash
 #SBATCH --job-name=python-job
+# default_queue caps at 4h; for long/large work use cpunormal or gpunormal (see managing-jobs)
 #SBATCH --partition=default_queue
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=4

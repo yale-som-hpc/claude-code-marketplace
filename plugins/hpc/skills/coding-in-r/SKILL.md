@@ -1,6 +1,6 @@
 ---
 name: coding-in-r
-description: R implementation rules — renv, tidyverse/data.table, paths, style, scripts. TRIGGER when editing .R, .Rmd, or .qmd files or writing R code.
+description: How to write research R — renv, tidyverse/data.table, project paths, style, scripts. TRIGGER when authoring or editing .R/.Rmd/.qmd files for research work. For running R on the Yale SOM HPC cluster (Slurm, renv on /gpfs), use running-r instead.
 related:
   - programming-and-coding
   - running-r

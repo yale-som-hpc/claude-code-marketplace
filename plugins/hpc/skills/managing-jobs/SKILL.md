@@ -1,6 +1,6 @@
 ---
 name: managing-jobs
-description: Submit, monitor, cancel, array, and chain Slurm jobs on the Yale SOM HPC cluster. TRIGGER when running, submitting, or scheduling any job, script, or analysis on the Yale SOM HPC cluster (even phrased plainly, e.g. "run my regression on the cluster"), writing sbatch scripts, choosing cluster partitions/resources, using job arrays or dependencies, or running sacct/squeue/scancel against cluster jobs.
+description: Submit, monitor, cancel, array, and chain Slurm jobs on the Yale SOM HPC cluster. TRIGGER when running, submitting, or scheduling any job or analysis on the cluster (even phrased plainly, e.g. "run my regression on the cluster"), writing sbatch scripts, choosing partitions/resources, or using job arrays, dependencies, or sacct/squeue/scancel.
 related:
   - overview
   - self-diagnosing-resource-use
@@ -8,11 +8,13 @@ related:
   - running-r
   - running-stata
   - using-gpus
-updated: 2026-04-29
+updated: 2026-06-10
 ---
 # Managing Jobs
 
 Rule: test small, request explicitly, monitor results, then scale.
+
+Before you submit a job — or recommend one to a human — ask **"am I being a good citizen?"** and answer it: right partition for the work, requested only what it uses (right-size `--mem`/`--cpus`/`--time`), not stranding idle GPUs with a CPU/RAM reservation, not storming GPFS with tiny files, and cleaning up after. The concrete how-to-answer for each is the [citizenship self-check in overview](../overview/SKILL.md#citizenship-self-check-run-this-before-every-job-and-every-recommendation). When you advise rather than submit, tell the human which checks you ran.
 
 ## Basic commands
 
@@ -32,11 +34,42 @@ squeue --me --start
 scontrol show job JOBID
 ```
 
+## Choosing a partition
+
+`default_queue` is the Slurm default, but it is a *short, small* queue (1h default / 4h max, only 6 nodes) and those nodes are shared with — and outranked by — the restricted `mbacourse` partition. So a `default_queue` job can pend with *"Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions"* **even when the cluster is mostly idle**, because the idle cores are on partitions it doesn't target.
+
+Before assuming "the cluster is full," look:
+
+```bash
+squeue --me -o "%.10i %.9P %.2t %.10M %r"   # %r = pending reason — read it
+sinfo -o "%R %C"                            # idle cores per partition (A/I/O/T)
+```
+
+Pick the partition that fits the work:
+
+- **Quick test jobs (≤4h):** `default_queue` is fine.
+- **Real / long / large CPU work:** `cpunormal` or `gpunormal` — these are the "normal" production queues with **no time limit**. `gpunormal` is the largest pool and, despite the name, takes CPU-only jobs (just omit `--gres`). When `default_queue`/`cpunormal` show 0 idle cores, a CPU job submitted to `gpunormal` typically starts immediately.
+- **GPU work:** `gpunormal` (`--gres=gpu:1`), or `h100` for H100s. See [using GPUs](../using-gpus/SKILL.md).
+
+### Running CPU work on `gpunormal` without stranding GPUs
+
+Most of the cluster's CPU cores live on the GPU nodes (the CPU-only partitions are just a handful of nodes), so substantial CPU work often *has* to run on `gpunormal`. The hazard: **Slurm reserves the CPU and RAM you request whether or not you use them**, and a GPU job needs CPU + RAM *alongside* its GPU. If your CPU-only job doesn't leave a GPU job's worth of headroom per still-idle GPU on that node, those GPUs become unschedulable — scarce hardware sits idle.
+
+This happens for real: a CPU-only job reserving ~900 GB on a 1 TB, 3-GPU node leaves only ~120 GB — room for one GPU job, stranding the other two GPUs, even though `nvidia-smi` shows them idle and the OS shows the RAM physically free. Reserved-but-unused is just as blocking as used.
+
+So when you must run CPU-only work on `gpunormal`:
+
+- **Right-size `--mem` and `--cpus-per-task` from `seff` — never pad "just in case."** This is the single biggest cause of accidental stranding.
+- **Leave a GPU's share free.** A GPU job here typically needs roughly **8 CPUs and ~120 GB per GPU** (check live with `squeue -p gpunormal -t R -O NumCPUs,MinMemory,tres-per-node`). On the 3-GPU nodes, a rule of thumb is to keep a CPU-only job under about **one-third** of a node's CPU and RAM so the other GPUs stay usable.
+- **Keep big CPU jobs off the scarcest GPU nodes** — prefer `cpunormal`/`default_queue`, or the RTX 8000 / 40 GB A100 nodes, over the 80 GB A100 and H100 nodes.
+- **Check what you'd be sitting next to:** `sinfo -N -p gpunormal -O NodeHost,CPUsState,FreeMem,Gres,GresUsed` shows nodes with idle GPUs (`GresUsed` < `Gres`) whose CPU/RAM you'd be tying up.
+
 ## Safe Slurm template
 
 ```bash
 #!/bin/bash
 #SBATCH --job-name=analysis
+# default_queue caps at 4h and is small; for long/large work use cpunormal or gpunormal (see "Choosing a partition")
 #SBATCH --partition=default_queue
 #SBATCH --time=00:30:00
 #SBATCH --cpus-per-task=4
@@ -93,6 +126,7 @@ Use arrays for independent tasks. Throttle concurrency with `%N`.
 ```bash
 #!/bin/bash
 #SBATCH --job-name=array-example
+# default_queue caps at 4h and is small; for long/large work use cpunormal or gpunormal (see "Choosing a partition")
 #SBATCH --partition=default_queue
 #SBATCH --array=1-500%50
 #SBATCH --time=00:30:00

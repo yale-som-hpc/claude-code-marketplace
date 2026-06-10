@@ -9,7 +9,7 @@ related:
   - managing-jobs
   - using-the-filesystem
   - working-with-large-data
-updated: 2026-05-15
+updated: 2026-06-10
 ---
 # Running R
 
@@ -19,7 +19,8 @@ Rule: load R explicitly, restore packages deliberately, and never let package in
 
 Slightly opinionated picks for new R projects on the cluster:
 
-- **Cluster R module** for the R executable. Load it explicitly in every job script with `module load r`.
+- **Cluster R module** for the R executable. Load it explicitly in every job script, and **pin the version** for reproducibility — pick one from `module spider r` and `module load r/<version>`, rather than bare `module load r`, which follows the moving default.
+- **The base R module ships essentially no add-on packages** — not even `renv`. `optparse`, `data.table`, `arrow`, `tidyverse`, `here`, `fixest`, etc. are all absent until you install them. Your very first setup step is bootstrapping a project library (see "Use renv carefully"); a job that `library(optparse)` without that step will fail with `there is no package called 'optparse'`.
 - **`renv`** for project libraries. `renv.lock` is the R analogue of `uv.lock` — it is what makes runs reproducible from login node to compute node.
 - **`pak`** as the installer behind `renv` for fast parallel installs.
 - **`lintr`** + **`styler`** for static checks and formatting; **`testthat`** for tests. Install once at project setup.
@@ -42,11 +43,11 @@ For the audience that is new to R — these are not stylistic preferences, they 
 
 ```bash
 module spider r
-module load r
+module load r/<version>   # pin a version from `module spider r`; bare `module load r` follows the moving default
 R --version
 ```
 
-Do this in job scripts too. Do not assume `R` is in the default PATH. Do not use `rig` or `mise` as the default R installer on this cluster: R versions are provided by Lmod modules, and user jobs should build reproducibility with `renv` on top of the loaded module.
+Do this in job scripts too. Do not assume `R` is in the default PATH. The base module's `.libPaths()` is read-only, so `install.packages()`/`renv` write to a personal or project library — and that first install needs outbound CRAN access from the login node. Do not use `rig` or `mise` as the default R installer on this cluster: R versions are provided by Lmod modules, and user jobs should build reproducibility with `renv` on top of the loaded module.
 
 ## Use renv carefully
 
@@ -89,6 +90,7 @@ Run `renv::restore()` once during setup, not inside hundreds of jobs. Mutating t
 ```bash
 #!/bin/bash
 #SBATCH --job-name=r-job
+# default_queue caps at 4h; for long/large work use cpunormal or gpunormal (see managing-jobs)
 #SBATCH --partition=default_queue
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=4
@@ -100,9 +102,12 @@ set -euo pipefail
 module purge
 module load r
 
+# The cluster R module is built against OpenBLAS, so OPENBLAS_NUM_THREADS is the
+# control that matters; OMP is also honored. MKL_NUM_THREADS is a no-op here
+# (no MKL) — kept only for portability.
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export OPENBLAS_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
+export MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 
 cd /gpfs/project/myproject/code
 srun Rscript src/main.R
@@ -116,6 +121,9 @@ Use an explicit script entry point so batch jobs can pass inputs and outputs.
 
 ```r
 #!/usr/bin/env Rscript
+# Requires `renv::install(c("optparse", "arrow"))` first — neither is in the base
+# module. (For zero-dependency scripts, base-R `commandArgs(trailingOnly = TRUE)`
+# works out of the box.)
 suppressPackageStartupMessages({
   library(optparse)
   library(arrow)
