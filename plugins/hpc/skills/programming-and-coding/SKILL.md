@@ -7,6 +7,7 @@ related:
   - code-review
 updated: 2026-06-16
 ---
+# Programming and Coding
 
 ## Core principles
 
@@ -36,7 +37,7 @@ updated: 2026-06-16
 
 - **Set seeds** for anything stochastic: `np.random.default_rng(42)`, `random_state=42`, `set.seed(42)`.
 - **Commit lockfiles** (`uv.lock`, `renv.lock`) and record the inputs a result was built from.
-- **Never mutate raw data.** Read from `data/raw/` (read-only), write to `data/derived-v3.2.3/` — re-derive, don't edit in place. 
+- **Never mutate raw data.** Read from `data/raw/` (read-only), write to `data/derived/` — re-derive, don't edit in place.
 - **Fail loudly** on missing inputs, schema mismatches, unexpected row-count changes, or violated assumptions — a silent wrong number is worse than a crash. Catch only specific exceptions you can handle, and log enough context to reproduce the failure.
 - **Don't hard-code personal paths** - put defaults in `.env`s, runners (Justfiles, Makefiles, or shell scripts), or config files (prefer TOML, YAML, and JSON).
 
