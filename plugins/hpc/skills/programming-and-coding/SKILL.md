@@ -38,6 +38,7 @@ updated: 2026-06-16
 - **Set seeds** for anything stochastic: `np.random.default_rng(42)`, `random_state=42`, `set.seed(42)`.
 - **Commit lockfiles** (`uv.lock`, `renv.lock`) and record the inputs a result was built from.
 - **Never mutate raw data.** Read from `data/raw/` (read-only), write to `data/derived/` — re-derive, don't edit in place.
+- **Manifest derived data.** Write a manifest beside any derived dataset so its provenance travels with the data — so anyone, including the agent in a later session, can answer *what is this, how was it made, is it still valid?* without rerunning the pipeline or guessing. Capture enough to make staleness checkable, using judgment about the specifics (a git commit only pins the code if the working tree was clean). A rough manifest beats none.
 - **Fail loudly** on missing inputs, schema mismatches, unexpected row-count changes, or violated assumptions — a silent wrong number is worse than a crash. Catch only specific exceptions you can handle, and log enough context to reproduce the failure.
 - **Don't hard-code personal paths** - put defaults in `.env`s, runners (Justfiles, Makefiles, or shell scripts), or config files (prefer TOML, YAML, and JSON).
 
@@ -66,7 +67,7 @@ updated: 2026-06-16
 - Provide one obvious way to run: CLI, config, `make` or `just` recipe. Notebooks must run top-to-bottom; reusable logic belongs in modules.
 - Validate config and data early: schemas, columns, types, ranges, missingness, duplicates. Report dropped rows.
 - Declare dependencies and versions. Avoid hardcoded absolute paths; accept input/output paths from the caller.
-- Record provenance with outputs: seeds, parameters, data version, code version. Never write secrets or sensitive data to logs/results.
+- Never write secrets or sensitive data to logs or results.
 - Sanity-check results: simple baselines, units, time zones, leakage, and intermediate data before final metrics.
 - Long jobs must be restartable and resource-aware: bounded parallelism, streaming/chunking, checkpoints, atomic writes.
 - Distinguish source-of-truth, cache, and disposable intermediates. Log enough context to debug a failed run later.
