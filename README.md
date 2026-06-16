@@ -75,6 +75,8 @@ You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This
 
 Install it through whichever surface matches how you run Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
 
+**Prefer to watch?** Here's a short [video walkthrough of the GUI install](https://videos.kyle.pub/v/yale-som-hpc-claude-code-marketplace-install).
+
 ### Claude Code Desktop app
 
 The Desktop app adds marketplaces through the **Customize** menu — *not* the **+** button next to the prompt box (that one only installs plugins from marketplaces you have already added).
