@@ -73,7 +73,7 @@ The plugin also ships a few slash commands as a typeable front door, so you don'
 
 You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This repo is a [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) — a catalog Claude Code can browse — and `hpc` is the [plugin](https://code.claude.com/docs/en/plugins) inside it that bundles all the skills. To use the skills, you add the marketplace once, then install the plugin from it. Nothing runs on the cluster until you ask Claude to do something there.
 
-**TL;DR** — in any Claude Code session, run:
+**TL;DR** — in any Claude Code *terminal* session, run:
 
 ```
 /plugin marketplace add yale-som-hpc/claude-code-marketplace
@@ -87,12 +87,25 @@ If you'd rather use a GUI, pick the surface below that matches how you use Claud
 The Desktop app adds marketplaces through the **Customize** menu — *not* the **+** button next to the prompt box (that one only installs plugins from marketplaces you have already added).
 
 1. In the left sidebar, click **Customize** → the **Plugins** tab.
-2. Under **Personal plugins**, click **+** → **Add marketplace** → **Add from a repository**.
-3. Enter the repository (a GitHub repo or git URL):
+
+   <img src="docs/01-click-on-customize.png" alt="Click Customize in the left sidebar" width="720" />
+
+2. Under **Personal plugins**, click **+** → **Add marketplace**.
+
+   <img src="docs/02-click-add-marketplace.png" alt="Click the plus, then Add marketplace" width="720" />
+
+3. Choose **Add from a repository**.
+
+   <img src="docs/03-click-add-from-repo.png" alt="Choose Add from a repository" width="720" />
+
+4. Paste the repository (a GitHub repo or git URL) and confirm:
    ```
    yale-som-hpc/claude-code-marketplace
    ```
-4. Back in the **Plugins** tab, click **Browse plugins**, find `hpc`, and click **Install**. Make sure it is **enabled**.
+
+   <img src="docs/04-paste-this-repo-url.png" alt="Paste the repository URL" width="720" />
+
+5. Back in the **Plugins** tab, click **Browse plugins**, find `hpc`, and click **Install**. Make sure it is **enabled**.
 
 See the [Desktop plugins docs](https://code.claude.com/docs/en/desktop#install-plugins) for the full UI walkthrough. Don't have the app yet? [Download Claude Desktop](https://claude.com/download).
 
