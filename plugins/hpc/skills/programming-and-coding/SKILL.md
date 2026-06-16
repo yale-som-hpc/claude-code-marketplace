@@ -5,56 +5,35 @@ related:
   - coding-in-python
   - coding-in-r
   - code-review
-  - code-overview
-updated: 2026-05-22
+updated: 2026-06-10
 ---
 # Programming and Coding
 
-Audience: SOM scholars and RAs writing research code. Optimize for correctness, rerunnability, and future-you.
+Audience: SOM scholars and RAs writing research code. Optimize for correctness, rerunnability, and future-you. This is the fallback when no language- or task-specific skill applies; it carries the reproducibility habits the others assume.
 
-## Rules
+## Reproducibility is correctness
 
-- Keep it simple. If code needs a paragraph of explanation, simplify it.
-- Make small changes. Run a small check after each meaningful change.
-- Prefer smoke tests on real data slices over elaborate test scaffolding.
-- Use descriptive names: `firm_panel`, `event_window`, `treatment_group`; not `df2`, `tmp`, `x`.
-- Keep functions focused. Rough target: one job, ~20 lines.
-- Keep files manageable. Rough target: <500 lines; split by concern.
-- Use boring tools first: stdlib/base language, then established libraries.
-- Set seeds for stochastic work: `random_state=42`, `np.random.default_rng(42)`, `set.seed(42)`.
-- Treat reproducibility as correctness: commit lockfiles, record inputs, do not mutate raw data.
+- **Set seeds** for anything stochastic: `np.random.default_rng(42)`, `random_state=42`, `set.seed(42)`.
+- **Commit lockfiles** (`uv.lock`, `renv.lock`) and record the inputs a result was built from.
+- **Never mutate raw data.** Read from `data/raw/` (read-only), write to `data/derived/` — re-derive, don't edit in place.
+- **Fail loudly** on missing inputs, schema mismatches, unexpected row-count changes, or violated assumptions — a silent wrong number is worse than a crash. Catch only specific exceptions you can handle, and log enough context to reproduce the failure.
 
-## Workflow
+## Write for the next person (often future-you)
 
-1. Read `README.md`, `CLAUDE.md`, `AGENTS.md` if present.
-2. Inspect nearby code. Match local style unless it is unsafe.
-3. Make the smallest correct change.
-4. Run a realistic small-input check.
-5. Check the output for plausibility, not just exit status.
-6. Remove dead code and stale comments.
-
-## Error handling
-
-- Catch only errors you can handle.
-- Catch specific exception classes.
-- Fail loudly on missing inputs, schema mismatches, unexpected row drops, invalid assumptions.
-- Log enough context to reproduce the failure.
-
-## Review mindset
-
-- Clarity over cleverness.
-- Explicit over implicit.
-- Flat over nested.
-- Readability over micro-optimization unless performance is proven critical.
+- Keep it simple — if code needs a paragraph to explain, simplify it.
+- Descriptive names: `firm_panel`, `event_window`, `treatment_group`; not `df2`, `tmp`, `x`.
+- Focused functions (~one job), manageable files (split by concern).
+- Boring tools first: stdlib/base language, then established libraries.
+- Smoke-test on a small slice of real data before a full run; check the output for plausibility, not just exit status.
 
 ## Checklist
 
-- [ ] Small realistic smoke test run
-- [ ] No hardcoded personal paths
-- [ ] Seeds set where needed
-- [ ] Lockfiles updated if dependencies changed
-- [ ] Raw data unchanged
-- [ ] Output plausible
+- [ ] Seeds set where needed.
+- [ ] Lockfiles updated if dependencies changed.
+- [ ] Raw data unchanged; outputs written to `derived/`.
+- [ ] Code fails loudly on bad inputs / row-count surprises.
+- [ ] Ran a small realistic smoke test; output is plausible.
+- [ ] No hardcoded personal paths.
 
 ## Further reading
 

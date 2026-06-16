@@ -1,6 +1,6 @@
 {
   "name": "hpc",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Yale SOM research computing skills: HPC, Slurm, GPUs, Python, R, Stata, Git, and reproducible coding.",
-  "author": { "name": "Yale SOM HPC" }
+  "author": { "name": "advanced HPC users and the Research Data Committee" }
 }

@@ -4,7 +4,7 @@ description: Run Stata batch jobs on the Yale SOM HPC cluster with logs, scratch
 related:
   - managing-jobs
   - using-the-filesystem
-  - working-with-large-data
+  - accelerating-python
   - self-diagnosing-resource-use
 updated: 2026-06-10
 ---

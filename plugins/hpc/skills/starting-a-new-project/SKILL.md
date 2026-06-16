@@ -3,9 +3,8 @@ name: starting-a-new-project
 description: Create a research project layout under /gpfs/project on the Yale SOM HPC cluster — reproducible, resumable, safe for shared use. TRIGGER when starting or reorganizing a project on the Yale SOM HPC cluster, choosing GPFS directories, or setting up cluster-side logs, lockfiles, and Slurm scripts.
 related:
   - programming-and-coding
-  - code-overview
   - using-git-and-github
-  - justfile
+  - task-runner
   - installing-software
   - managing-jobs
   - running-python
@@ -101,28 +100,20 @@ Read @AGENTS.md for this project's context.
 
 (A symlink — `ln -s AGENTS.md CLAUDE.md` — works too if you don't need any Claude-only lines.)
 
-## Add a thin Justfile
+## Capture your commands in a task runner
 
-Use `just` to document common commands without hiding what they do.
+Put the project's common commands (setup, build, submit) in one file so they're reproducible and the agent can rerun them. **`just` is not installed on the cluster** — start with a `Makefile` or `run.sh`, which work out of the box. See [task runner](../task-runner/SKILL.md) for the full treatment and when to use shell vs make vs just.
 
-```just
-set dotenv-load
-set shell := ["bash", "-euo", "pipefail", "-c"]
-
-default:
-    @just --list
-
+```make
+.PHONY: setup test-job
 setup:
-    uv sync
-
-run *ARGS:
-    uv run python src/main.py {{ARGS}}
+	uv sync
 
 test-job:
-    sbatch slurm/test.sh
+	sbatch slurm/test.sh        # resources live in the sbatch file, not here
 ```
 
-Keep recipes thin. The real logic should live in Python/R/Stata scripts, not in the Justfile.
+Keep recipes thin — the real logic lives in your Python/R/Stata scripts, not the runner.
 
 ## First test job
 
@@ -145,7 +136,7 @@ Do not lock `data/raw/` before collaborators have finished placing the initial f
 - [ ] Raw data is read-only.
 - [ ] Environments are reproducible from lockfiles.
 - [ ] Logs go to `logs/`.
-- [ ] Justfile or README documents the common commands.
+- [ ] A task runner (`Makefile`/`run.sh`) or README documents the common commands.
 - [ ] `CLAUDE.md` records the project's cluster norms (Claude Code reads it, not `AGENTS.md`).
 - [ ] First Slurm test job passes before any full run.
 

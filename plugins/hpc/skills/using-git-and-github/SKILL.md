@@ -1,6 +1,6 @@
 ---
 name: using-git-and-github
-description: Git and GitHub for work on the Yale SOM HPC cluster — module load git, SSH agent forwarding, research-data .gitignore, big-file handling. TRIGGER when running git/gh on the cluster, committing, deciding what to track, or opening PRs from cluster work.
+description: Git and GitHub for research work — commits, branches, what to track, big-file pushback, PRs; on the Yale SOM HPC cluster also module load git and SSH agent forwarding. TRIGGER when running git/gh, committing, deciding what to track or ignore, or opening PRs.
 related:
   - programming-and-coding
   - code-review

@@ -1,10 +1,10 @@
 ---
 name: coding-in-r
-description: How to write research R — renv, tidyverse/data.table, project paths, style, scripts. TRIGGER when authoring or editing .R/.Rmd/.qmd files for research work. For running R on the Yale SOM HPC cluster (Slurm, renv on /gpfs), use running-r instead.
+description: How to write R well — renv, tidyverse/data.table, project paths, style, scripts, seeds. TRIGGER when authoring or editing .R/.Rmd/.qmd files. For running R on the Yale SOM HPC cluster (Slurm, renv on /gpfs), use running-r instead.
 related:
   - programming-and-coding
   - running-r
-  - working-with-large-data
+  - accelerating-python
   - code-review
 updated: 2026-05-22
 ---

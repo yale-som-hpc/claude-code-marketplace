@@ -8,7 +8,7 @@ related:
   - installing-software
   - managing-jobs
   - using-the-filesystem
-  - working-with-large-data
+  - accelerating-python
 updated: 2026-06-10
 ---
 # Running R

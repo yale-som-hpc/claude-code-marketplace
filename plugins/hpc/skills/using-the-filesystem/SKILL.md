@@ -3,7 +3,7 @@ name: using-the-filesystem
 description: Use GPFS on the Yale SOM HPC cluster (/gpfs/project, /gpfs/scratch60, compute-node /tmp) without metadata storms. TRIGGER when choosing storage locations on the Yale SOM HPC cluster, moving files to/from GPFS, using cluster scratch/tmp, handling many small files on the cluster, or diagnosing GPFS I/O bottlenecks.
 related:
   - overview
-  - working-with-large-data
+  - accelerating-python
   - acquiring-data
   - installing-software
   - self-diagnosing-resource-use
@@ -207,4 +207,4 @@ If `ls` takes seconds or file counts are in the tens of thousands, consolidate.
 - [rsync man page](https://www.man7.org/linux/man-pages/man1/rsync.1.html) — `-avP`, `--partial`, `--checksum`, `--exclude`.
 - [croc](https://github.com/schollz/croc) — encrypted peer-to-peer transfers with collaborators.
 - [rclone documentation](https://rclone.org/docs/) — cloud and S3-compatible transfers.
-- [Apache Arrow / Parquet](https://arrow.apache.org/docs/) — columnar format reference (also see working-with-large-data).
+- [Apache Arrow / Parquet](https://arrow.apache.org/docs/) — columnar format reference (also see accelerating-python).

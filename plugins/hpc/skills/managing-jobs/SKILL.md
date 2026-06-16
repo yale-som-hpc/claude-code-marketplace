@@ -187,7 +187,7 @@ Shorter jobs often schedule faster because Slurm can backfill them into idle slo
 
 ## Right-size before submitting
 
-Do not pad requests "just in case." Over-requesting blocks scheduling for everyone, and the cluster is moving toward enforced per-user caps. The right-sizing loop:
+Do not pad requests "just in case." Over-requesting blocks scheduling for everyone else on a shared cluster (there are no per-user caps — it runs on courtesy). The right-sizing loop:
 
 1. Submit a 10-minute test job with a small input.
 2. Run `seff JOBID` after it finishes.

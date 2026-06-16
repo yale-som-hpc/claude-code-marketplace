@@ -1,12 +1,11 @@
 ---
 name: coding-in-python
-description: How to write research Python — uv environments, formatting, CLI scripts, logging. TRIGGER when authoring or editing .py files for research work. For running Python on the Yale SOM HPC cluster (sbatch, Slurm, uv on /gpfs), use running-python instead.
+description: How to write Python well — uv environments, formatting, CLI scripts, logging, seeds. TRIGGER when authoring or editing .py files. For running Python on the Yale SOM HPC cluster (sbatch, Slurm, uv on /gpfs), use running-python instead.
 related:
   - programming-and-coding
   - running-python
   - parallel-python
   - accelerating-python
-  - working-with-large-data
   - code-review
 updated: 2026-05-22
 ---

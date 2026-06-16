@@ -6,7 +6,7 @@ related:
   - using-gpus
   - using-the-filesystem
   - running-python
-  - working-with-large-data
+  - accelerating-python
 updated: 2026-06-09
 ---
 # Self-Diagnosing Resource Use
@@ -47,7 +47,7 @@ Rules of thumb:
 
 If `MaxRSS` is 4 GB and you requested 128 GB, lower `--mem` next time. Aim for **~1.5–2× the observed peak**, not 10×.
 
-Why this matters: Slurm reserves the full requested memory whether or not your job uses it. A user requesting 1 TB for a 10 GB job is removing 1 TB from everyone else's available pool until the job ends. Per-user memory caps are the most likely first enforcement step on this cluster — get ahead of them by right-sizing now.
+Why this matters: Slurm reserves the full requested memory whether or not your job uses it. A user requesting 1 TB for a 10 GB job is removing 1 TB from everyone else's available pool until the job ends. There are no per-user caps enforcing this — it runs on courtesy — so right-sizing is simply good citizenship on a shared machine.
 
 ## Check current jobs
 

@@ -9,7 +9,6 @@ related:
   - managing-jobs
   - parallel-python
   - accelerating-python
-  - working-with-large-data
   - using-gpus
   - acquiring-data
 updated: 2026-06-10
@@ -80,7 +79,7 @@ For most cluster work, these are the right defaults:
 - **Multi-user database** → `psycopg` with `psycopg_pool`; create one pool per process if you fork.
 - **Unknown encodings** → `charset-normalizer` to detect, then pass `encoding=` explicitly.
 
-Worked examples for query patterns and ingestion live in [working with large data](../working-with-large-data/SKILL.md) and [acquiring data](../acquiring-data/SKILL.md).
+Worked examples for query patterns and ingestion live in [accelerating Python](../accelerating-python/SKILL.md) and [acquiring data](../acquiring-data/SKILL.md).
 
 ## Safe Python Slurm template
 

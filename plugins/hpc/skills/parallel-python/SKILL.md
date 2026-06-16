@@ -5,7 +5,6 @@ related:
   - running-python
   - accelerating-python
   - managing-jobs
-  - working-with-large-data
   - acquiring-data
   - self-diagnosing-resource-use
 updated: 2026-06-09

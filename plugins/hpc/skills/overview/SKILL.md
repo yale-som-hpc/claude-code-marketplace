@@ -104,11 +104,9 @@ You are usually acting for a researcher who will not think to ask "is this waste
 
 If any answer is "no" or "I'm not sure," fix it before submitting. When you advise a human rather than submit yourself, state which of these you checked and what you found — that is how the answer gets acted on.
 
-## Treat caps as if they exist
+## Operate as if the resource is finite (because it is)
 
-Today the cluster has light enforcement of per-user resource caps, but that is not a design choice — it is a courtesy. Other clusters (Grace, most NSF/DOE systems) have hard partition caps, monthly compute budgets, and tight interactive limits. SOM HPC is moving in that direction.
-
-Operate as if the rules already apply:
+The cluster has **no per-user resource caps** — requests run on courtesy, not enforcement. That is exactly why your behavior matters: other people are running jobs on these same nodes, GPUs, and GPFS servers right now, and nothing but restraint leaves room for them. Operate accordingly:
 
 - Request what you need, not what feels safe. Aim for ~1.5–2× observed peak memory, not 10×.
 - Prefer batch over interactive. Interactive sessions should be the smallest allocation that lets you debug, with a time limit measured in hours, not days. Never leave one open overnight.

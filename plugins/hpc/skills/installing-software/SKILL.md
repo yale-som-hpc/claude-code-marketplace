@@ -5,7 +5,7 @@ related:
   - overview
   - running-python
   - running-r
-  - justfile
+  - task-runner
   - connecting-securely
   - using-the-filesystem
 updated: 2026-05-06
@@ -49,7 +49,7 @@ export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 Prefer statically-linked builds from GitHub releases if available. Inspect "curl to sh" install patterns prior to using those. Common per-user tools:
 
 - `uv` — Python project manager (install snippet below).
-- `duckdb` — CLI for SQL over Parquet/CSV/JSON; not module-loadable on the cluster. See [working with large data](../working-with-large-data/SKILL.md#installing-the-cli-tools).
+- `duckdb` — CLI for SQL over Parquet/CSV/JSON; not module-loadable on the cluster. See [accelerating Python](../accelerating-python/SKILL.md#installing-the-cli-tools).
 - `qsv` — fast CSV triage; not module-loadable. Same place.
 - `gh` — GitHub CLI.
 - `jq` — JSON on the command line.

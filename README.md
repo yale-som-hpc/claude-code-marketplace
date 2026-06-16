@@ -11,6 +11,8 @@ The skills were developed with two virtues in mind.
 1. **Skillfulness.** Get your research done swiftly, beautifully, and correctly.
 2. **Citizenship.** The HPC is a shared resource. Other people are running jobs right now on the same nodes, GPUs, and GPFS metadata servers.
 
+_Authored on a best-effort basis by advanced HPC users and the Research Data Committee. This is practitioner guidance, not official SOM IT documentation — verify operational specifics (accounts, quotas, current policy) with HPC support, and the live cluster with `sinfo -s` / `module spider`._
+
 ## What's in the `hpc` plugin
 
 Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front door, with the mental model, partition layout, and how the rest fit together. Then:
@@ -24,9 +26,9 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | [starting-a-new-project](plugins/hpc/skills/starting-a-new-project/SKILL.md) | Reproducible project layout. |
 | [installing-software](plugins/hpc/skills/installing-software/SKILL.md) | Modules, uv, static binaries, Apptainer. |
 | [using-git-and-github](plugins/hpc/skills/using-git-and-github/SKILL.md) | Agent git behavior for researchers: commits, branches, big-file pushback. |
-| [code-overview](plugins/hpc/skills/code-overview/SKILL.md) | Five-minute orientation inside an unfamiliar research repo. |
 | [code-review](plugins/hpc/skills/code-review/SKILL.md) | Review for paths, data, seeds, lockfiles, cluster mistakes. |
 | [programming-and-coding](plugins/hpc/skills/programming-and-coding/SKILL.md) | Cross-language research coding rules. |
+| [task-runner](plugins/hpc/skills/task-runner/SKILL.md) | Capture project commands (shell/make/just) so steps are reproducible. |
 
 ### Run jobs
 
@@ -38,7 +40,7 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 | [coding-in-python](plugins/hpc/skills/coding-in-python/SKILL.md) | General Python: uv, ruff, pathlib, scripts, logging, seeds. |
 | [running-python](plugins/hpc/skills/running-python/SKILL.md) | uv, Slurm, thread control, resumable tasks. |
 | [parallel-python](plugins/hpc/skills/parallel-python/SKILL.md) | Worker sizing, spawn-vs-fork, nested-parallelism warning. |
-| [accelerating-python](plugins/hpc/skills/accelerating-python/SKILL.md) | DuckDB, Polars, Numba, when to add parallelism. |
+| [accelerating-python](plugins/hpc/skills/accelerating-python/SKILL.md) | Profiling, DuckDB/Polars/Numba, larger-than-memory data, when to add parallelism. |
 | [coding-in-r](plugins/hpc/skills/coding-in-r/SKILL.md) | General R: renv, tidyverse/data.table, here, style, CLI scripts, seeds. |
 | [running-r](plugins/hpc/skills/running-r/SKILL.md) | renv, Rscript Slurm jobs, BLAS thread control. |
 | [running-stata](plugins/hpc/skills/running-stata/SKILL.md) | Batch do-files, scratch temp, license courtesy. |
@@ -47,15 +49,15 @@ Start with [overview](plugins/hpc/skills/overview/SKILL.md) — it's the front d
 
 | Skill | Purpose |
 |---|---|
-| [working-with-large-data](plugins/hpc/skills/working-with-large-data/SKILL.md) | Parquet, columnar formats, query engines. |
-| [acquiring-data](plugins/hpc/skills/acquiring-data/SKILL.md) | WRDS, REST APIs, scraping, connection pooling, request-hash caches. |
+| [acquiring-data](plugins/hpc/skills/acquiring-data/SKILL.md) | WRDS, REST APIs, credentials, connection pooling, request-hash caches. |
+| [scraping-at-scale](plugins/hpc/skills/scraping-at-scale/SKILL.md) | High-volume crawls: durable SQLite catalogs, single-archive bodies, /local staging. |
 
 ### Diagnose
 
 | Skill | Purpose |
 |---|---|
 | [self-diagnosing-resource-use](plugins/hpc/skills/self-diagnosing-resource-use/SKILL.md) | sacct, seff, post-job right-sizing. |
-| [justfile](plugins/hpc/skills/justfile/SKILL.md) | Justfile syntax, when to prefer just vs make vs shell scripts. |
+| [troubleshooting](plugins/hpc/skills/troubleshooting/SKILL.md) | Triage common cluster errors (pending, killed, OOM, GLIBC, module) to fixes. |
 
 ## Commands
 

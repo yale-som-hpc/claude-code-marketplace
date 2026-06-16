@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review research code, diffs, or PRs for correctness and cluster pitfalls — hardcoded scratch paths, resource mismatch, GPFS tiny-file storms, package installs inside arrays. TRIGGER when reviewing code or a diff/PR, or before committing research code.
+description: Review code, diffs, or PRs for correctness, plus research/cluster pitfalls — hardcoded scratch paths, resource mismatch, GPFS tiny-file storms, package installs inside arrays. TRIGGER when reviewing code or a diff/PR, or before committing.
 related:
   - programming-and-coding
   - coding-in-python
