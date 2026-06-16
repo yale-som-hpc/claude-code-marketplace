@@ -73,14 +73,7 @@ The plugin also ships a few slash commands as a typeable front door, so you don'
 
 You need [Claude Code](https://code.claude.com/docs/en/overview) installed. This repo is a [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) — a catalog Claude Code can browse — and `hpc` is the [plugin](https://code.claude.com/docs/en/plugins) inside it that bundles all the skills. To use the skills, you add the marketplace once, then install the plugin from it. Nothing runs on the cluster until you ask Claude to do something there.
 
-**TL;DR** — in any Claude Code *terminal* session, run:
-
-```
-/plugin marketplace add yale-som-hpc/claude-code-marketplace
-/plugin install hpc@yale-som-hpc
-```
-
-If you'd rather use a GUI, pick the surface below that matches how you use Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
+Install it through whichever surface matches how you run Claude Code. Plugin state is shared per-user, so installing once enables `hpc` in every local Claude Code session on your machine.
 
 ### Claude Code Desktop app
 
