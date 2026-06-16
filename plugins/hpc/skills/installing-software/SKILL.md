@@ -8,7 +8,7 @@ related:
   - task-runner
   - connecting-securely
   - using-the-filesystem
-updated: 2026-05-06
+updated: 2026-06-16
 ---
 # Installing Software
 
@@ -109,11 +109,18 @@ If SSH auth fails, see [connecting securely](../connecting-securely/SKILL.md).
 
 ## When to use Apptainer
 
-Apptainer is not in the default PATH. Load the module first:
+Apptainer is not in the default PATH. Load the module first, and run pulls inside a Slurm job (a pull is compute + network) — point the cache and tmp dirs at scratch so a large image doesn't fill your home directory:
 
 ```bash
+export APPTAINER_CACHEDIR=/gpfs/scratch60/$USER/.apptainer/cache
+export APPTAINER_TMPDIR=/gpfs/scratch60/$USER/.apptainer/tmp
+mkdir -p "$APPTAINER_CACHEDIR" "$APPTAINER_TMPDIR"
 module load apptainer
+apptainer pull docker://alpine:3.20
+apptainer exec alpine_3.20.sif cat /etc/os-release   # runs as you, no root
 ```
+
+(On compute nodes an older system Apptainer may shadow the module — check `apptainer --version` inside the job if you need a specific version.)
 
 Use Apptainer when:
 
