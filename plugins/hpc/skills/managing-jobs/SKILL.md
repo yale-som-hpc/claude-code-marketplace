@@ -60,9 +60,71 @@ This happens for real: a CPU-only job reserving ~900 GB on a 1 TB, 3-GPU node le
 So when you must run CPU-only work on `gpunormal`:
 
 - **Right-size `--mem` and `--cpus-per-task` from `seff` — never pad "just in case."** This is the single biggest cause of accidental stranding.
-- **Leave a GPU's share free.** A GPU job here typically needs roughly **8 CPUs and ~120 GB per GPU** (check live with `squeue -p gpunormal -t R -O NumCPUs,MinMemory,tres-per-node`). On the 3-GPU nodes, a rule of thumb is to keep a CPU-only job under about **one-third** of a node's CPU and RAM so the other GPUs stay usable.
+- **Leave a GPU's share free.** A GPU job here typically needs roughly **8 CPUs and ~120 GB per GPU** (check live with `squeue -p gpunormal -t R -O NumCPUs,MinMemory,tres-per-node`). On 3-GPU nodes, reserve CPU-only work in slices that leave about **24 CPUs and 360 GB** free if the GPUs are still idle.
+- **For big CPU arrays, do not submit thousands of independent 1-core array jobs directly to `gpunormal`.** A global array throttle (`%200`) does not protect per-node headroom; Slurm can still pack the jobs onto GPU nodes until their CPUs/RAM are full. Prefer one **node-slice worker** allocation: one modest CPU/RAM slice per node, then run many serial tasks inside that slice.
 - **Keep big CPU jobs off the scarcest GPU nodes** — prefer `cpunormal`/`default_queue`, or the RTX 8000 / 40 GB A100 nodes, over the 80 GB A100 and H100 nodes.
 - **Check what you'd be sitting next to:** `sinfo -N -p gpunormal -O NodeHost,CPUsState,FreeMem,Gres,GresUsed` shows nodes with idle GPUs (`GresUsed` < `Gres`) whose CPU/RAM you'd be tying up.
+
+Good patterns for CPU-only batch work on `gpunormal`:
+
+**Pattern A: node-slice worker for many single-core commands** (best for CmdStan chains, simulations, bootstrap reps, etc.). First make a manifest with one command per line:
+
+```bash
+# commands.txt: one independent serial task per line
+/gpfs/home/me/cmdstan/model sample data file=data/a.json output file=results/a.csv
+/gpfs/home/me/cmdstan/model sample data file=data/b.json output file=results/b.csv
+```
+
+Submit a few bounded slices, not thousands of tiny Slurm jobs:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=cpu-slice
+#SBATCH --partition=gpunormal
+#SBATCH --nodes=4                 # start small; scale after checking queue impact
+#SBATCH --ntasks=4                # match --nodes: one worker task per node
+#SBATCH --ntasks-per-node=1        # one worker per node
+#SBATCH --cpus-per-task=32         # run at most 32 serial commands per node
+#SBATCH --mem=32G                  # right-size; e.g. 1G per command, not 4G if it uses 80M
+#SBATCH --time=04:00:00
+#SBATCH --output=logs/%x_%j_%t.out
+
+set -euo pipefail
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+
+srun --ntasks="$SLURM_NTASKS" --ntasks-per-node=1 bash worker.sh commands.txt
+```
+
+`worker.sh` shards the manifest across workers and uses local parallelism inside each slice:
+
+```bash
+#!/bin/bash
+set -euo pipefail
+cmdfile=$1
+
+awk -v r="$SLURM_PROCID" -v n="$SLURM_NTASKS" '((NR - 1) % n) == r' "$cmdfile" |
+  parallel --line-buffer --halt soon,fail=1 -j "$SLURM_CPUS_PER_TASK" --joblog "logs/${SLURM_JOB_ID}_${SLURM_PROCID}.joblog"
+```
+
+Why this is good: the example runs 128 serial tasks at once, but reserves only 32 CPUs / 32 GB per node. On a 128-core, 3-GPU node it leaves about 96 CPUs and most memory available, so GPU jobs can still land.
+
+**Pattern B: if you keep a Slurm array, make it small and low-memory.** This is simpler but less protective because Slurm can still pack tasks unevenly:
+
+```bash
+#SBATCH --partition=cpunormal,gpunormal
+#SBATCH --array=1-1000%100         # cap total concurrency; lower this if GPU jobs are pending
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=1G                   # set from seff/MaxRSS; do not pad to 4G if it uses <1G
+#SBATCH --time=04:00:00
+```
+
+When scarce GPU jobs are pending, either lower the throttle further or temporarily avoid the A100 nodes:
+
+```bash
+#SBATCH --exclude=c009-c017        # avoid A100 nodes for CPU-only work when needed
+```
 
 ## Safe Slurm template
 
