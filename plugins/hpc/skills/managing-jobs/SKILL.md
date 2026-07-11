@@ -8,7 +8,7 @@ related:
   - running-r
   - running-stata
   - using-gpus
-updated: 2026-06-10
+updated: 2026-07-10
 ---
 # Managing Jobs
 
@@ -55,13 +55,13 @@ Pick the partition that fits the work:
 
 Most of the cluster's CPU cores live on the GPU nodes (the CPU-only partitions are just a handful of nodes), so substantial CPU work often *has* to run on `gpunormal`. The hazard: **Slurm reserves the CPU and RAM you request whether or not you use them**, and a GPU job needs CPU + RAM *alongside* its GPU. If your CPU-only job doesn't leave a GPU job's worth of headroom per still-idle GPU on that node, those GPUs become unschedulable — scarce hardware sits idle.
 
-This happens for real: a CPU-only job reserving ~900 GB on a 1 TB, 3-GPU node leaves only ~120 GB — room for one GPU job, stranding the other two GPUs, even though `nvidia-smi` shows them idle and the OS shows the RAM physically free. Reserved-but-unused is just as blocking as used.
+This happens for real: filling 124 of 128 CPUs on a 3-GPU node leaves only 4 schedulable CPUs, so all three GPUs can be stranded even when `nvidia-smi` shows them idle and the OS shows plenty of RAM physically free. Reserved-but-unused CPU or RAM is just as blocking as used.
 
 So when you must run CPU-only work on `gpunormal`:
 
 - **Right-size `--mem` and `--cpus-per-task` from `seff` — never pad "just in case."** This is the single biggest cause of accidental stranding.
-- **Leave a GPU's share free.** A GPU job here typically needs roughly **8 CPUs and ~120 GB per GPU** (check live with `squeue -p gpunormal -t R -O NumCPUs,MinMemory,tres-per-node`). On 3-GPU nodes, reserve CPU-only work in slices that leave about **24 CPUs and 360 GB** free if the GPUs are still idle.
-- **For big CPU arrays, do not submit thousands of independent 1-core array jobs directly to `gpunormal`.** A global array throttle (`%200`) does not protect per-node headroom; Slurm can still pack the jobs onto GPU nodes until their CPUs/RAM are full. Prefer one **node-slice worker** allocation: one modest CPU/RAM slice per node, then run many serial tasks inside that slice.
+- **Leave practical minimum headroom per idle GPU: about 8 CPUs and 32 GB of schedulable RAM.** Current ordinary GPU jobs commonly request 6–8 CPUs and 12–24 GB per GPU, though some host-memory-heavy jobs request 120–160 GB. On a 3-GPU node with all GPUs idle, leave at least **24 CPUs and ~96 GB** free. This keeps ordinary GPU jobs schedulable without requiring CPU users to surrender most of the node's RAM; unusually memory-heavy GPU jobs may still need to wait for a roomier node. Check the live mix with `squeue -p gpunormal -t R -O NumCPUs,MinMemory,tres-per-node`.
+- **For big CPU arrays, do not submit thousands of independent 1-core array jobs directly to `gpunormal`.** A global array throttle (`%200`) does not protect per-node headroom; Slurm can still pack the jobs onto GPU nodes until their CPUs/RAM are full. Prefer one **node-slice worker** allocation: one bounded CPU/RAM slice per node, then run many serial tasks inside that slice.
 - **Keep big CPU jobs off the scarcest GPU nodes** — prefer `cpunormal`/`default_queue`, or the RTX 8000 / 40 GB A100 nodes, over the 80 GB A100 and H100 nodes.
 - **Check what you'd be sitting next to:** `sinfo -N -p gpunormal -O NodeHost,CPUsState,FreeMem,Gres,GresUsed` shows nodes with idle GPUs (`GresUsed` < `Gres`) whose CPU/RAM you'd be tying up.
 
@@ -84,8 +84,8 @@ Submit a few bounded slices, not thousands of tiny Slurm jobs:
 #SBATCH --nodes=4                 # start small; scale after checking queue impact
 #SBATCH --ntasks=4                # match --nodes: one worker task per node
 #SBATCH --ntasks-per-node=1        # one worker per node
-#SBATCH --cpus-per-task=32         # run at most 32 serial commands per node
-#SBATCH --mem=32G                  # right-size; e.g. 1G per command, not 4G if it uses 80M
+#SBATCH --cpus-per-task=96         # leave at least 24 of 128 CPUs for the GPUs
+#SBATCH --mem=384G                 # example: 4G/command; leaves >96G on 512G nodes
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/%x_%j_%t.out
 
@@ -108,7 +108,7 @@ awk -v r="$SLURM_PROCID" -v n="$SLURM_NTASKS" '((NR - 1) % n) == r' "$cmdfile" |
   parallel --line-buffer --halt soon,fail=1 -j "$SLURM_CPUS_PER_TASK" --joblog "logs/${SLURM_JOB_ID}_${SLURM_PROCID}.joblog"
 ```
 
-Why this is good: the example runs 128 serial tasks at once, but reserves only 32 CPUs / 32 GB per node. On a 128-core, 3-GPU node it leaves about 96 CPUs and most memory available, so GPU jobs can still land.
+Why this is good: the example runs 384 serial tasks at once while leaving 32 CPUs and roughly 110 GB of schedulable RAM on each nominally 512 GB node. That is enough headroom for three ordinary 8-CPU / 24–32 GB GPU jobs. A host-memory-heavy GPU job may still need to wait for a roomier node. The 4 GB per command is only an example: set it from `.batch` `MaxRSS` data, and lower the slice's `--mem` if the commands use less.
 
 **Pattern B: if you keep a Slurm array, make it small and low-memory.** This is simpler but less protective because Slurm can still pack tasks unevenly:
 
